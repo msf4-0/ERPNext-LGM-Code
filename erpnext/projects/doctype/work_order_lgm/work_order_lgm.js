@@ -21,14 +21,29 @@ frappe.ui.form.on('Work Order LGM', {
 
 	before_save: function(frm){
 		if (frm.doc["weighing_table_lgm"] == undefined){
-			frm.call({
-				method: "create_work_order_lgm",
+			// returning the frm.call promise here is required: before_save must wait
+			// for the server round-trip to finish before the save proceeds, otherwise
+			// the Work Order could save with an empty weighing_table_lgm if the
+			// response arrives after Frappe has already read frm.doc for saving.
+			return frm.call({
+				method: "populate_work_order_ingredients",
 				args:{
 					doc:frm.doc
-				},
-				callback:function(r){
-					return frm.doc = r.message;
 				}
+			}).then((r) => {
+				// clear first, then add each row through frm.add_child so Frappe
+				// attaches the child-table bookkeeping (name, parent, parentfield,
+				// idx) that a raw JSON assignment would be missing — same pattern
+				// used in stages_lgm.js's before_save for its batch_weight_lgm_N tables
+				frm.doc.weighing_table_lgm = [];
+				(r.message.weighing_table_lgm || []).forEach((row) => {
+					frm.add_child("weighing_table_lgm", {
+						'mixer_no': row.mixer_no,
+						'ingredient': row.ingredient,
+						'ingredient_weight': row.ingredient_weight
+					});
+				});
+				frm.refresh_field("weighing_table_lgm");
 			});
 		}
 		
@@ -68,9 +83,9 @@ frappe.ui.form.on('Work Order LGM', {
 			}
 		}
 
-		// stock availability check
+		// stock entry check
 		frm.call({
-			method:"check_stock_availability",
+			method:"check_stock_entry",
 			args:{
 				doc: frm.doc,
 			},

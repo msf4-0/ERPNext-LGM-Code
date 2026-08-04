@@ -115,11 +115,16 @@ def get_ingredients_per_stage(doc):
 				output.append((stage[1], k, stage_recipe_ingredients))
 	return output
 
-# function to get the ingredients from the request sheet 
-# function is only called if the work order is not created from request sheet,
-# rather it is created from the work order list
+# function to compute the ingredient list from the request sheet's stages and
+# attach it to the in-memory doc as weighing_table_lgm, WITHOUT inserting or
+# saving anything server-side. The actual Work Order LGM record is created
+# afterwards by the client's normal save flow (see before_save in
+# work_order_lgm.js). Only called when a Work Order is created from the
+# Work Order list directly (not from a Request Sheet, which uses its own
+# create_work_order_lgm in technological_request_sheets_lgm.py that DOES
+# insert/save — the two are intentionally different despite the old shared name).
 @frappe.whitelist()
-def create_work_order_lgm(doc):
+def populate_work_order_ingredients(doc):
 	# parse to json object
 	doc = json.loads(doc)
 
@@ -137,7 +142,7 @@ def create_work_order_lgm(doc):
 			}
 		)
 
-	# insert record
+	# attach to the in-memory doc — no insert/save here, see docstring above
 	doc["weighing_table_lgm"] = table_list
 	return doc
 
@@ -298,7 +303,7 @@ def query_stages(doc):
 			else:
 				break
 
-	# callers of this function (create_work_order_lgm, create_job_card_lgm) assume
+	# callers of this function (populate_work_order_ingredients, create_job_card_lgm) assume
 	# stages already exist for this Request Sheet, so an empty result here means
 	# something's wrong upstream — fail loudly instead of silently creating an
 	# empty Work Order or zero Job Cards
