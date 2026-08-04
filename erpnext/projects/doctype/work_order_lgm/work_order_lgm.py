@@ -195,7 +195,7 @@ def check_stock_entry(doc):
 		ingredient_name = keys[0]
 		ingredient_weight = keys[1]
 		stock_entry_detail = dict(
-			s_warehosue = stores,
+			s_warehouse = stores,
 			t_warehouse = wip,
 			item_code = ingredient_name,
 			qty = ingredient_weight
