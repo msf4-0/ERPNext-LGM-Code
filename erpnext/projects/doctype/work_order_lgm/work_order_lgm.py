@@ -165,6 +165,17 @@ def get_ingredients_from_stages(doc):
 @frappe.whitelist()
 def check_stock_entry(doc):
 	doc = json.loads(doc)
+
+	# if a Material Transfer stock entry already exists for this work order,
+	# do not create a duplicate — return False so the caller can stop and warn
+	existing = frappe.get_list(
+		"Stock Entry",
+		fields="name",
+		filters={"work_order_lgm": doc["name"], "stock_entry_type": "Material Transfer"}
+	)
+	if len(existing) > 0:
+		return False
+
 	ingredient_list = doc["weighing_table_lgm"]
 	weights = {}
 	# summing up the weights based on the ingredients
