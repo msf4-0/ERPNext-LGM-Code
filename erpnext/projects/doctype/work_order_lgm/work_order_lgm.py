@@ -226,6 +226,52 @@ def check_stock_entry(doc):
 	stock_entry.submit()
 	return True
 
+# function to check whether the Stores warehouse has enough on-hand quantity
+# of every ingredient in the weighing table before a Material Transfer is created.
+# Kept separate from check_stock_entry (which only guards against duplicate
+# stock entries) because these are two independent conditions:
+#   - check_stock_entry:      "has this already been transferred?"
+#   - check_stock_availability: "is there enough stock to transfer?"
+# Returns:
+#   - the name of the first ingredient found short on stock (str), or
+#   - True if every ingredient has sufficient stock
+@frappe.whitelist()
+def check_stock_availability(doc):
+	doc = json.loads(doc)
+	ingredient_list = doc["weighing_table_lgm"]
+
+	# sum up the required weight per ingredient, same as check_stock_entry does,
+	# since the same ingredient can appear on multiple rows (e.g. from different stages)
+	weights = {}
+	for i in range(len(ingredient_list)):
+		ingredient_name = ingredient_list[i]["ingredient"]
+		ingredient_weight = float(ingredient_list[i]["weighed"])
+		if weights.get(ingredient_name) is None:
+			weights[ingredient_name] = ingredient_weight
+		else:
+			weights[ingredient_name] += ingredient_weight
+
+	# find the Stores warehouse the same way check_stock_entry does
+	warehouses = frappe.get_all("Warehouse", fields="name")
+	stores = None
+	for warehouse in warehouses:
+		if "Stores" in warehouse["name"]:
+			stores = warehouse["name"]
+			break
+
+	# check each ingredient's actual on-hand quantity in Stores via the Bin doctype,
+	# which is where ERPNext/Frappe tracks per-item, per-warehouse stock levels
+	for ingredient_name, needed_qty in weights.items():
+		bin_qty = frappe.db.get_value(
+			"Bin",
+			{"item_code": ingredient_name, "warehouse": stores},
+			"actual_qty"
+		) or 0
+		if bin_qty < needed_qty:
+			return ingredient_name
+
+	return True
+
 # function to query all the request sheet that has no work order
 @frappe.whitelist()
 def get_all_work_order():

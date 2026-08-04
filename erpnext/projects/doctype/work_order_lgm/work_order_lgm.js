@@ -68,9 +68,9 @@ frappe.ui.form.on('Work Order LGM', {
 			}
 		}
 
-		// stock entry check
+		// stock availability check
 		frm.call({
-			method:"check_stock_entry",
+			method:"check_stock_availability",
 			args:{
 				doc: frm.doc,
 			},
