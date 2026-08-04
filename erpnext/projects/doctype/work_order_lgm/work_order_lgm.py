@@ -289,13 +289,22 @@ def query_stages(doc):
 	for i in range (0,5):
 		if len(stages) == 0:
 			first_stage = frappe.get_list("Stages LGM", filters={'request_sheet_link': request_sheet, 'is_first_stage': 1})
-			stages.append(("stage_"+str(i+1),first_stage[0]["name"]))
+			if len(first_stage) > 0:
+				stages.append(("stage_"+str(i+1),first_stage[0]["name"]))
 		else:
 			next_stage = frappe.get_list("Stages LGM", filters={'previous_stage_link': stages[i-1][1]})
 			if len(next_stage) > 0:
 				stages.append(("stage_"+str(i+1), next_stage[0]["name"]))
 			else:
 				break
+
+	# callers of this function (create_work_order_lgm, create_job_card_lgm) assume
+	# stages already exist for this Request Sheet, so an empty result here means
+	# something's wrong upstream — fail loudly instead of silently creating an
+	# empty Work Order or zero Job Cards
+	if len(stages) == 0:
+		frappe.throw(_("No stages found for Request Sheet {0}. Please create stages before creating a Work Order or Job Card.").format(request_sheet))
+
 	return stages
 
 # function to get all job cards related to current work order, and maximum number of job cards possible for current work order
