@@ -1,3 +1,10 @@
+# ERPNext LGM Code
+
+## Introduction
+This is the production repository for ERPNext LGM, containing a modified version of ERPNext V12. 
+
+For easy deployment on Docker, please use the deployment repository here: https://github.com/msf4-0/ERPNext-LGM. You can also find a user workflow guide on the same deployment repository's Wiki: https://github.com/msf4-0/ERPNext-LGM/wiki
+
 <div align="center">
     <img src="https://raw.githubusercontent.com/frappe/erpnext/develop/erpnext/public/images/erpnext-logo.png" height="128">
     <h2>ERPNext</h2>
