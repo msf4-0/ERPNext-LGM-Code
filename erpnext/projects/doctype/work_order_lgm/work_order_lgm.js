@@ -26,7 +26,7 @@ frappe.ui.form.on('Work Order LGM', {
 			// the Work Order could save with an empty weighing_table_lgm if the
 			// response arrives after Frappe has already read frm.doc for saving.
 			return frm.call({
-				method: "populate_work_order_ingredients",
+				method: "create_work_order_lgm",
 				args:{
 					doc:frm.doc
 				}
