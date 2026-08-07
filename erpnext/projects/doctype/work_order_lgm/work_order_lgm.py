@@ -106,7 +106,8 @@ def create_work_order_lgm(doc):
 				{
 					"ingredient": ingredient_details[0],
 					"ingredient_weight": ingredient_details[1],
-					"mixer_no": ingredient_details[2]
+					"mixer_no": ingredient_details[2],
+					"source_warehouse": None
 				}
 			)
 
@@ -143,10 +144,63 @@ def get_ingredients_from_request_sheet(doc):
 			ingredient_list.append(ingredient)
 	return ingredient_list
 
-# function to check if stock entry already exist for current work order
+# function to check whether every ingredient's own source_warehouse has enough
+# on-hand quantity before a Material Transfer is created.
+# Groups by (ingredient, source_warehouse) rather than just ingredient, because
+# the same ingredient can now legitimately be sourced from two different
+# warehouses across two rows (e.g. two different mixers).
+# Returns a list of shortfalls (empty list = everything is sufficient), each:
+#   {"ingredient": ..., "source_warehouse": ..., "needed": ..., "available": ...}
 @frappe.whitelist()
-def check_stock_entry(doc):
+def check_stock_availability(doc):
 	doc = json.loads(doc)
+	ingredient_list = doc["weighing_table_lgm"]
+
+	# sum up the required weight per (ingredient, source_warehouse) pair,
+	# since the same pair can appear on multiple rows (e.g. different mixers)
+	weights = {}
+	for row in ingredient_list:
+		ingredient_name = row["ingredient"]
+		source_warehouse = row.get("source_warehouse")
+		if not source_warehouse:
+			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
+		key = (ingredient_name, source_warehouse)
+		weights[key] = weights.get(key, 0) + float(row["weighed"])
+
+	# check each (ingredient, source_warehouse) pair's actual on-hand quantity
+	# via the Bin doctype, which is where ERPNext/Frappe tracks per-item,
+	# per-warehouse stock levels
+	shortfalls = []
+	for (ingredient_name, source_warehouse), needed_qty in weights.items():
+		bin_qty = frappe.db.get_value(
+			"Bin",
+			{"item_code": ingredient_name, "warehouse": source_warehouse},
+			"actual_qty"
+		) or 0
+		if bin_qty < needed_qty:
+			shortfalls.append({
+				"ingredient": ingredient_name,
+				"source_warehouse": source_warehouse,
+				"needed": needed_qty,
+				"available": bin_qty
+			})
+
+	return shortfalls
+
+# function to create the Material Transfer stock entry for a work order.
+# warehouse_overrides is an optional {ingredient: fallback_warehouse} map —
+# populated by the user when check_stock_availability found that ingredient's
+# normal source_warehouse short, and they picked a different warehouse to
+# pull from instead. Any ingredient not in the map uses its own row-level
+# source_warehouse as usual.
+@frappe.whitelist()
+def check_stock_entry(doc, warehouse_overrides=None):
+	doc = json.loads(doc)
+	if warehouse_overrides:
+		if isinstance(warehouse_overrides, str):
+			warehouse_overrides = json.loads(warehouse_overrides)
+	else:
+		warehouse_overrides = {}
 
 	# if a Material Transfer stock entry already exists for this work order,
 	# do not create a duplicate — return False so the caller can stop and warn
@@ -160,98 +214,46 @@ def check_stock_entry(doc):
 
 	ingredient_list = doc["weighing_table_lgm"]
 	weights = {}
-	# summing up the weights based on the ingredients
-	# get total weight of the ingredients in a work order 
-	for i in range (len(ingredient_list)):
-		ingredient_name = ingredient_list[i]["ingredient"]
-		ingredient_weight = float(ingredient_list[i]["weighed"])
-		if weights.get(ingredient_name) is None:
-			weights[ingredient_name] = ingredient_weight
-		else:
-			ori_weight = weights[ingredient_name]
-			weights[ingredient_name] = ori_weight + ingredient_weight
+	# summing up the weights based on (ingredient, source_warehouse) — the
+	# override, if the human picked a fallback for this ingredient, wins over
+	# the row's own source_warehouse
+	for row in ingredient_list:
+		ingredient_name = row["ingredient"]
+		source_warehouse = warehouse_overrides.get(ingredient_name) or row.get("source_warehouse")
+		if not source_warehouse:
+			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
+		key = (ingredient_name, source_warehouse)
+		weights[key] = weights.get(key, 0) + float(row["weighed"])
 
-	# create stock entry
-	stock_entry_details = []
+	# get wip warehouse — unchanged substring-match logic, left as-is (out of
+	# scope for this pass)
 	warehouses = frappe.get_all("Warehouse", fields="name")
-	stores = None
 	wip = None
-	# get wip and stores warehouses
 	for warehouse in warehouses:
-		if "Stores" in warehouse["name"]:
-			stores = warehouse["name"]
-		elif "Work In" in warehouse["name"]:
+		if "Work In" in warehouse["name"]:
 			wip = warehouse["name"]
 
-	# put all ingredients and ingredient weights into a list
-	for keys in weights.items():
-		ingredient_name = keys[0]
-		ingredient_weight = keys[1]
-		stock_entry_detail = dict(
-			s_warehouse = stores,
+	# put each (ingredient, source_warehouse) pair and its total weight into
+	# the stock entry's item rows
+	stock_entry_details = []
+	for (ingredient_name, source_warehouse), ingredient_weight in weights.items():
+		stock_entry_details.append(dict(
+			s_warehouse = source_warehouse,
 			t_warehouse = wip,
 			item_code = ingredient_name,
 			qty = ingredient_weight
-		)
-		stock_entry_details.append(stock_entry_detail)
+		))
 
-	# isnert stock entry record here
+	# insert stock entry record here — no single header-level from_warehouse
+	# any more, since source warehouses now differ per row
 	stock_entry = frappe.get_doc(dict(
 		doctype = "Stock Entry",
 		stock_entry_type = "Material Transfer",
 		work_order_lgm = doc["name"],
-		from_warehouse = stores,
 		to_warehouse = wip,
 		items = stock_entry_details,
 	)).insert()
-	stock_entry.save()
 	stock_entry.submit()
-	return True
-
-# function to check whether the Stores warehouse has enough on-hand quantity
-# of every ingredient in the weighing table before a Material Transfer is created.
-# Kept separate from check_stock_entry (which only guards against duplicate
-# stock entries) because these are two independent conditions:
-#   - check_stock_entry:      "has this already been transferred?"
-#   - check_stock_availability: "is there enough stock to transfer?"
-# Returns:
-#   - the name of the first ingredient found short on stock (str), or
-#   - True if every ingredient has sufficient stock
-@frappe.whitelist()
-def check_stock_availability(doc):
-	doc = json.loads(doc)
-	ingredient_list = doc["weighing_table_lgm"]
-
-	# sum up the required weight per ingredient, same as check_stock_entry does,
-	# since the same ingredient can appear on multiple rows (e.g. from different stages)
-	weights = {}
-	for i in range(len(ingredient_list)):
-		ingredient_name = ingredient_list[i]["ingredient"]
-		ingredient_weight = float(ingredient_list[i]["weighed"])
-		if weights.get(ingredient_name) is None:
-			weights[ingredient_name] = ingredient_weight
-		else:
-			weights[ingredient_name] += ingredient_weight
-
-	# find the Stores warehouse the same way check_stock_entry does
-	warehouses = frappe.get_all("Warehouse", fields="name")
-	stores = None
-	for warehouse in warehouses:
-		if "Stores" in warehouse["name"]:
-			stores = warehouse["name"]
-			break
-
-	# check each ingredient's actual on-hand quantity in Stores via the Bin doctype,
-	# which is where ERPNext/Frappe tracks per-item, per-warehouse stock levels
-	for ingredient_name, needed_qty in weights.items():
-		bin_qty = frappe.db.get_value(
-			"Bin",
-			{"item_code": ingredient_name, "warehouse": stores},
-			"actual_qty"
-		) or 0
-		if bin_qty < needed_qty:
-			return ingredient_name
-
 	return True
 
 # function to query all the request sheet that has no work order
