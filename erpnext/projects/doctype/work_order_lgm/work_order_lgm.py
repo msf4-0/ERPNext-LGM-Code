@@ -194,7 +194,7 @@ def check_stock_availability(doc):
 # pull from instead. Any ingredient not in the map uses its own row-level
 # source_warehouse as usual.
 @frappe.whitelist()
-def check_stock_entry(doc, warehouse_overrides=None):
+def create_material_transfer(doc, warehouse_overrides=None):
 	doc = json.loads(doc)
 	if warehouse_overrides:
 		if isinstance(warehouse_overrides, str):
@@ -224,6 +224,30 @@ def check_stock_entry(doc, warehouse_overrides=None):
 			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
 		key = (ingredient_name, source_warehouse)
 		weights[key] = weights.get(key, 0) + float(row["weighed"])
+
+	# re-check availability against the *final resolved* warehouse for each
+	# ingredient (its own source_warehouse, or the human-provided override).
+	# This is necessary because the earlier check_stock_availability call only
+	# ever validated each row's original source_warehouse — it has no way of
+	# knowing whether a fallback warehouse the human just picked is itself
+	# short. Same shape of result as check_stock_availability, so the caller
+	# can reuse the same dialog logic if this comes back non-empty.
+	shortfalls = []
+	for (ingredient_name, source_warehouse), needed_qty in weights.items():
+		bin_qty = frappe.db.get_value(
+			"Bin",
+			{"item_code": ingredient_name, "warehouse": source_warehouse},
+			"actual_qty"
+		) or 0
+		if bin_qty < needed_qty:
+			shortfalls.append({
+				"ingredient": ingredient_name,
+				"source_warehouse": source_warehouse,
+				"needed": needed_qty,
+				"available": bin_qty
+			})
+	if shortfalls:
+		return shortfalls
 
 	# get wip warehouse — unchanged substring-match logic, left as-is (out of
 	# scope for this pass)
