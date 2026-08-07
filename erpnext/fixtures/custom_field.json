@@ -1,0 +1,33 @@
+[
+ {
+  "allow_on_submit": 0,
+  "bold": 0,
+  "collapsible": 0,
+  "columns": 0,
+  "dt": "Stock Entry",
+  "doctype": "Custom Field",
+  "fieldname": "work_order_lgm",
+  "fieldtype": "Link",
+  "hidden": 0,
+  "ignore_user_permissions": 0,
+  "ignore_xss_filter": 0,
+  "in_global_search": 0,
+  "in_list_view": 0,
+  "in_standard_filter": 0,
+  "insert_after": "stock_entry_type",
+  "label": "Work Order LGM",
+  "name": "Stock Entry-work_order_lgm",
+  "no_copy": 0,
+  "options": "Work Order LGM",
+  "owner": "Administrator",
+  "permlevel": 0,
+  "print_hide": 0,
+  "print_hide_if_no_value": 0,
+  "read_only": 0,
+  "report_hide": 0,
+  "reqd": 0,
+  "search_index": 1,
+  "translatable": 0,
+  "unique": 0
+ }
+]
