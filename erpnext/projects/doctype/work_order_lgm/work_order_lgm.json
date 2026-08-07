@@ -27,8 +27,7 @@
    "fieldname": "weighing_table_lgm",
    "fieldtype": "Table",
    "label": "Weighing Table",
-   "options": "Ingredients Weighing Table LGM",
-   "read_only": 1
+   "options": "Ingredients Weighing Table LGM"
   },
   {
    "default": "Work-Order-.##",
