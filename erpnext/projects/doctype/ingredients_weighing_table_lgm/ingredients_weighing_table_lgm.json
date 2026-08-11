@@ -7,7 +7,8 @@
   "ingredient",
   "ingredient_weight",
   "mixer_no",
-  "weighed"
+  "weighed",
+  "source_warehouse"
  ],
  "fields": [
   {
@@ -36,8 +37,14 @@
    "fieldname": "weighed",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Weighed",
-   "read_only": 1
+   "label": "Weighed"
+  },
+  {
+   "fieldname": "source_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Source Warehouse",
+   "options": "Warehouse"
   }
  ],
  "istable": 1,

@@ -61,6 +61,19 @@ email_append_to = ["Job Applicant", "Lead", "Opportunity", "Issue"]
 
 calendars = ["Task", "Work Order", "Leave Application", "Sales Order", "Holiday List", "Course Schedule"]
 
+# Work Order LGM customizations: ships the Custom Field(s) defined in
+# erpnext/fixtures/custom_field.json so they get (re)created automatically
+# on `bench migrate`, instead of relying on a one-off manual Customize Form
+# edit that wouldn't exist on a fresh database (e.g. a new Docker deployment).
+fixtures = [
+	{
+		"doctype": "Custom Field",
+		"filters": [
+			["name", "in", ["Stock Entry-work_order_lgm"]]
+		]
+	}
+]
+
 
 
 domains = {
