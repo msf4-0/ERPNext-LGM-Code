@@ -139,7 +139,7 @@ frappe.ui.form.on('Work Order LGM', {
 							overrides[s.ingredient] = values['warehouse_' + idx];
 						});
 						frm.call({
-							method: "check_stock_entry",
+							method: "create_material_transfer",
 							args: {
 								doc: frm.doc,
 								warehouse_overrides: overrides
