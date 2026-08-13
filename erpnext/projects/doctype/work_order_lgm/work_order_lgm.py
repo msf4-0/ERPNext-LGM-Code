@@ -3,6 +3,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from __future__ import annotations
 import math
 import frappe, json
 from frappe.model.document import Document
