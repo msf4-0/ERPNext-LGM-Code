@@ -289,6 +289,8 @@ def _get_ingredient_weights(doc: dict) -> dict:
 		key = (ingredient_docname, source_whouse_docname)
 		weights[key] = weights.get(key, 0) + float(row["weighed"])
 
+	return weights
+
 def _create_and_submit_material_transfer(work_order_name: str, items: list[dict], to_warehouse_docname: str = None):
 	"""
 	Creates, submits, and returns a material transfer.
