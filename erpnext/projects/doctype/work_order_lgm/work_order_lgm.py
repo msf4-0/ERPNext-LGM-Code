@@ -157,6 +157,7 @@ def get_ingredients_from_request_sheet(doc):
 def check_stock_availability(doc):
 	doc = json.loads(doc)
 	ingredient_list = doc["weighing_table_lgm"]
+	recorded_ingredients = []
 
 	# sum up the required weight per (ingredient, source_warehouse) pair,
 	# since the same pair can appear on multiple rows (e.g. different mixers)
@@ -164,8 +165,17 @@ def check_stock_availability(doc):
 	for row in ingredient_list:
 		ingredient_name = row["ingredient"]
 		source_warehouse = row.get("source_warehouse")
+
 		if not source_warehouse:
 			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
+
+		if ingredient_name in ingredient_list and ingredient_name in recorded_ingredients:
+			frappe.throw(_(
+				"Ingredient {0} shows up in 2 separate Weighing Table rows."
+				"Please remove the duplicate row."
+			).format(ingredient_name))
+		recorded_ingredients.append(ingredient_name)
+
 		key = (ingredient_name, source_warehouse)
 		weights[key] = weights.get(key, 0) + float(row["weighed"])
 
@@ -250,15 +260,32 @@ def _get_ingredient_weights(doc: dict) -> dict:
 		dict:
 			Key = (ingredient_docname, source_warehouse_docname): tuple(str, str)
 			Value = Weight of combination: float
+
+	Throws:
+		frappe.throw:
+			When the same ingredient shows up twice in the table
 	"""
 	ingredient_list = doc["weighing_table_lgm"]
 	weights = {}
+	recorded_ingredients = []
 
+	# sum up the required weight per (ingredient, source_warehouse) pair,
+	# since the same pair can appear on multiple rows (e.g. different mixers)
+	weights = {}
 	for row in ingredient_list:
 		ingredient_docname = row["ingredient"]
 		source_whouse_docname = row.get("source_warehouse")
+
 		if not source_whouse_docname:
 			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_docname))
+
+		if ingredient_docname in ingredient_list and ingredient_docname in recorded_ingredients:
+			frappe.throw(_(
+				"Ingredient {0} shows up in 2 separate Weighing Table rows."
+				"Please remove the duplicate row."
+			).format(ingredient_docname))
+		recorded_ingredients.append(ingredient_docname)
+
 		key = (ingredient_docname, source_whouse_docname)
 		weights[key] = weights.get(key, 0) + float(row["weighed"])
 
