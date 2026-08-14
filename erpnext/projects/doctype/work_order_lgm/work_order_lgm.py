@@ -376,7 +376,7 @@ def _handle_replenishment(doc: dict, weights: dict, warehouse_overrides: dict) -
 			s_warehouse = fallback_whouse_docname,
 			t_warehouse = source_whouse_docname,
 			item_code = ingredient_docname,
-			qty = fallback_weight
+			qty = replenish_weight
 		))
 
 	if shortfalls:
