@@ -147,51 +147,6 @@ def get_ingredients_from_request_sheet(doc):
 			ingredient_list.append(ingredient)
 	return ingredient_list
 
-# function to check whether every ingredient's own source_warehouse has enough
-# on-hand quantity before a Material Transfer is created.
-# Groups by (ingredient, source_warehouse) rather than just ingredient, because
-# the same ingredient can now legitimately be sourced from two different
-# warehouses across two rows (e.g. two different mixers).
-# Returns a list of shortfalls (empty list = everything is sufficient), each:
-#   {"ingredient": ..., "source_warehouse": ..., "needed": ..., "available": ...}
-@frappe.whitelist()
-def check_stock_availability(doc):
-	doc = json.loads(doc)
-	ingredient_list = doc["weighing_table_lgm"]
-	recorded_ingredients = []
-
-	# sum up the required weight per (ingredient, source_warehouse) pair,
-	# since the same pair can appear on multiple rows (e.g. different mixers)
-	weights = {}
-	for row in ingredient_list:
-		ingredient_name = row["ingredient"]
-		source_warehouse = row.get("source_warehouse")
-
-		if not source_warehouse:
-			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
-
-		if ingredient_name in ingredient_list and ingredient_name in recorded_ingredients:
-			frappe.throw(_(
-				"Ingredient {0} shows up in 2 separate Weighing Table rows."
-				"Please remove the duplicate row."
-			).format(ingredient_name))
-		recorded_ingredients.append(ingredient_name)
-
-		key = (ingredient_name, source_warehouse)
-		weights[key] = weights.get(key, 0) + float(row["weighed"])
-
-	# check each (ingredient, source_warehouse) pair's actual on-hand quantity
-	# via the Bin doctype, which is where ERPNext/Frappe tracks per-item,
-	# per-warehouse stock levels
-	shortfalls = []
-	for (ingredient_name, source_warehouse), needed_qty in weights.items():
-		bin_qty = _get_bin_qty(ingredient_name, source_warehouse)
-		if bin_qty < needed_qty:
-			_add_shortfall(ingredient_name, source_warehouse, 
-				  needed_qty, bin_qty, shortfalls)
-
-	return shortfalls
-
 def _get_bin_qty(ingredient_name: str, warehouse_name: str) -> int:
     """
     Gets the quantity (bin) of an ingredient based on its name and warehouse.
