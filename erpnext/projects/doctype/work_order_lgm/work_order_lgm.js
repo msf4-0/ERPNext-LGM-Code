@@ -38,6 +38,7 @@ frappe.ui.form.on('Work Order LGM', {
 				frm.doc.weighing_table_lgm = [];
 				(r.message.weighing_table_lgm || []).forEach((row) => {
 					frm.add_child("weighing_table_lgm", {
+						'ingredient_type': row.ingredient_type,
 						'mixer_no': row.mixer_no,
 						'ingredient': row.ingredient,
 						'ingredient_weight': row.ingredient_weight,
