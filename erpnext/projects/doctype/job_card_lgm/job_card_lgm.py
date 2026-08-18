@@ -135,7 +135,7 @@ def get_instructions(doc):
 	output = []
 	for instruction in instruction_list:
 		output.append({
-			"mixing_time": (int)instruction.mixing_time,
+			"mixing_time": int(instruction.mixing_time),
 			"mixing_process": instruction.mixing_process
 		})
 	return output
