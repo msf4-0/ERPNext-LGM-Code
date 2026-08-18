@@ -66,9 +66,6 @@ def create_job_card_lgm(doc):
 
 	# parse to json object
 	doc = json.loads(doc)
-	# check if work order that is linked to the current request sheet already exists
-	if len(frappe.db.get_all('Job Card LGM', fields="work_order", filters={"work_order": doc["name"]})) > 0:
-		frappe.throw(_("Job Card for current work order already exists."))
 
 	# get ingredients
 	ingredients_dict = get_ingredients(doc)
@@ -77,9 +74,21 @@ def create_job_card_lgm(doc):
 	workstation_request_sheet = technological_request_sheet.factory_reference_no
 	mixing_instruction = technological_request_sheet.mixing_cycle
 
+	job_cards = []
+
 	for ingredient_type, ingredients_list in ingredients_dict.items():
+		if not ingredient_type:
+			frappe.throw(_("Ingredient type not present for ingredients {0}".format(ingredients_list)))
+
 		if not ingredients_list:
 			continue
+
+		if frappe.db.exists("Job Card LGM", {
+			"work_order": doc.get("name"),
+			"ingredient_type": ingredient_type
+		}):
+			frappe.throw(_("Job Card for Work Order {0} with Ingredient Type {1} already exists.")
+				.format(doc.get("name"), ingredient_type))
 
 		job_card_lgm = frappe.get_doc(dict(
 			doctype = 'Job Card LGM',
@@ -90,9 +99,13 @@ def create_job_card_lgm(doc):
 			ingredient_type = ingredient_type,
 			ingredients = ingredients_list,
 			mixing_cycle = mixing_instruction
-		)).insert()
+		))
 
-		job_card_lgm.save()
+		# Save job cards, only insert when all job cards are created successfully
+		job_cards.append(job_card_lgm)
+
+	for job_card_lgm in job_cards:
+		job_card_lgm.insert()
 
 	return True
 
