@@ -5,6 +5,7 @@
  "engine": "InnoDB",
  "field_order": [
   "ingredient",
+  "ingredient_type",
   "ingredient_weight",
   "mixer_no",
   "weighed",
@@ -19,6 +20,13 @@
    "options": "Item",
    "read_only": 1
   },
+  {
+    "fieldname": "ingredient_type",
+    "fieldtype": "Data",
+    "in_list_view": 1,
+    "label": "Ingredient Type",
+    "read_only": 1
+  }
   {
    "fieldname": "mixer_no",
    "fieldtype": "Data",
