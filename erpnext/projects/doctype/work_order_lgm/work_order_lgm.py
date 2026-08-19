@@ -55,59 +55,67 @@ def get_ingredients(doc):
 
 @frappe.whitelist()
 def create_job_card_lgm(doc):
-	"""
-	Creates Job Card LGM documents based on values filled in the doc.
+    """
+    Creates Job Card LGM documents based on values filled in the doc.
+    One job card will be created per ingredient type.
+    """
+    doc = json.loads(doc)
+    ingredients_dict = get_ingredients(doc)
 
-	One job card will be created per ingredient type.
+    technological_request_sheet = frappe.get_doc("Technological Request Sheets LGM", doc["request_sheet_link"])
+    workstation_request_sheet = technological_request_sheet.factory_reference_no
+    mixing_instruction = technological_request_sheet.mixing_cycle
 
-	Returns:
-		bool: True if success
-	"""
+    # Rebuild the list as dictionaries to prevent parent theft
+    new_mixing_cycle = []
+    for instruction in mixing_instruction:
+        new_mixing_cycle.append({
+            "mixing_time": instruction.mixing_time,
+            "mixing_process": instruction.mixing_process
+        })
 
-	# parse to json object
-	doc = json.loads(doc)
+    job_cards = []
+    created_count = 0
+    valid_types_count = 0 # Track valid attempts to prevent failing on empty payloads
 
-	# get ingredients
-	ingredients_dict = get_ingredients(doc)
+    for ingredient_type, ingredients_list in ingredients_dict.items():
+        if not ingredient_type:
+            frappe.throw(_("Ingredient type not present for ingredients {0}".format(ingredients_list)))
 
-	technological_request_sheet = frappe.get_doc("Technological Request Sheets LGM", doc["request_sheet_link"])
-	workstation_request_sheet = technological_request_sheet.factory_reference_no
-	mixing_instruction = technological_request_sheet.mixing_cycle
+        if not ingredients_list:
+            continue
+            
+        valid_types_count += 1
 
-	job_cards = []
+        # Skip gracefully instead of aborting the entire process
+        if frappe.db.exists("Job Card LGM", {
+            "work_order": doc.get("name"),
+            "ingredient_type": ingredient_type
+        }):
+            continue 
 
-	for ingredient_type, ingredients_list in ingredients_dict.items():
-		if not ingredient_type:
-			frappe.throw(_("Ingredient type not present for ingredients {0}".format(ingredients_list)))
+        job_card_lgm = frappe.get_doc(dict(
+            doctype = 'Job Card LGM',
+            work_order = doc["name"],
+            request_sheet = doc["request_sheet_link"],
+            workstation = workstation_request_sheet,
+            for_quantity = 1,
+            ingredient_type = ingredient_type,
+            ingredients = ingredients_list,
+            mixing_cycle = new_mixing_cycle
+        ))
 
-		if not ingredients_list:
-			continue
+        job_cards.append(job_card_lgm)
+        created_count += 1
 
-		if frappe.db.exists("Job Card LGM", {
-			"work_order": doc.get("name"),
-			"ingredient_type": ingredient_type
-		}):
-			frappe.throw(_("Job Card for Work Order {0} with Ingredient Type {1} already exists.")
-				.format(doc.get("name"), ingredient_type))
+    # Only throw if we had valid items to process, but none were actually created
+    if valid_types_count > 0 and created_count == 0:
+        frappe.throw(_("All Job Cards for Work Order {0} already exist.").format(doc.get("name")))
 
-		job_card_lgm = frappe.get_doc(dict(
-			doctype = 'Job Card LGM',
-			work_order = doc["name"],
-			request_sheet = doc["request_sheet_link"],
-			workstation = workstation_request_sheet,
-			for_quantity = 1,
-			ingredient_type = ingredient_type,
-			ingredients = ingredients_list,
-			mixing_cycle = mixing_instruction
-		))
+    for job_card_lgm in job_cards:
+        job_card_lgm.insert()
 
-		# Save job cards, only insert when all job cards are created successfully
-		job_cards.append(job_card_lgm)
-
-	for job_card_lgm in job_cards:
-		job_card_lgm.insert()
-
-	return True
+    return True
 
 @frappe.whitelist()
 def create_work_order_lgm(doc):
