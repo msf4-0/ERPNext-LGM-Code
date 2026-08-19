@@ -49,6 +49,7 @@ def get_ingredients(doc):
 			"ingredient_weight": row_data.get("ingredient_weight"),
 			"mixer_no": row_data.get("mixer_no"),
 			"weighed": row_data.get("weighed"),
+			"source_warehouse": row_data.get("source_warehouse"),
 		})
 
 	return output

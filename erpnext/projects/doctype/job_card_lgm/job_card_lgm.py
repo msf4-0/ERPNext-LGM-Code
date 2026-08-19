@@ -120,7 +120,8 @@ def get_ingredients(doc):
 				'ingredient': d.ingredient,
 				'ingredient_weight': d.weighed,
 				'mixer_no': d.mixer_no,
-				'weighed': d.weighed
+				'weighed': d.weighed,
+				'source_warehouse': d.source_warehouse
 			})
 		
 	return ingredient_list
