@@ -19,37 +19,6 @@ frappe.ui.form.on('Work Order LGM', {
 		});
 	},
 
-	before_save: function(frm){
-		if (frm.doc["weighing_table_lgm"] == undefined){
-			// returning the frm.call promise here is required: before_save must wait
-			// for the server round-trip to finish before the save proceeds, otherwise
-			// the Work Order could save with an empty weighing_table_lgm if the
-			// response arrives after Frappe has already read frm.doc for saving.
-			return frm.call({
-				method: "create_work_order_lgm",
-				args:{
-					doc:frm.doc
-				}
-			}).then((r) => {
-				// clear first, then add each row through frm.add_child so Frappe
-				// attaches the child-table bookkeeping (name, parent, parentfield,
-				// idx) that a raw "frm.doc = r.message" assignment would be missing,
-				// and so the grid actually re-renders
-				frm.doc.weighing_table_lgm = [];
-				(r.message.weighing_table_lgm || []).forEach((row) => {
-					frm.add_child("weighing_table_lgm", {
-						'ingredient_type': row.ingredient_type,
-						'mixer_no': row.mixer_no,
-						'ingredient': row.ingredient,
-						'ingredient_weight': row.ingredient_weight,
-						'source_warehouse': row.source_warehouse
-					});
-				});
-				frm.refresh_field("weighing_table_lgm");
-			});
-		}
-	},
-
 	refresh: function(frm) {
 		if (frm.doc.docstatus === 1) {
 			frm.add_custom_button(__('Create Job Card LGM'), function() {

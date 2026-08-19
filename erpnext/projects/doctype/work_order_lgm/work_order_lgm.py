@@ -8,7 +8,7 @@ from frappe.model.document import Document
 from frappe import _
 
 class WorkOrderLGM(Document):
-	pass
+    pass
 
 @frappe.whitelist(allow_guest=True)
 def get_weight_from_nodered():
@@ -46,7 +46,7 @@ def get_ingredients(doc):
 
 		output[ingredient_type].append({
 			"ingredient": row_data.get("ingredient"),
-			"ingredient_weight": row_data.get("weighed"),
+			"ingredient_weight": row_data.get("ingredient_weight"),
 			"mixer_no": row_data.get("mixer_no"),
 			"weighed": row_data.get("weighed"),
 		})
@@ -116,55 +116,6 @@ def create_job_card_lgm(doc):
         job_card_lgm.insert()
 
     return True
-
-@frappe.whitelist()
-def create_work_order_lgm(doc):
-	"""
-	Creates a new Work Order LGM based on doc's details.
-	"""
-	# parse to json object
-	doc = json.loads(doc)
-
-	request_sheet_doc = frappe.get_doc("Technological Request Sheets LGM", doc["request_sheet_link"])
-	ingredients_list = get_ingredients_from_request_sheet(request_sheet_doc)
-
-	doc["weighing_table_lgm"] = ingredients_list
-	return doc
-
-def get_ingredients_from_request_sheet(doc):
-	"""
-	Gets ingredients from the compounding and curing ingredients table.
-
-	Returns:
-		list[dict]: List of dicts of ingredients with the following fields:
-			"ingredient_type", "ingredient", "ingredient_weight", 
-			"mixer_no", "source_warehouse"
-	"""
-	# get ingredients from commpounding ingredients child table
-	ingredient_list = []
-
-	compounding_list = doc.get("compounding_ingredients", [])
-	curing_list = doc.get("curing_ingredients", [])
-	type_list_pairs = [("Compounding", compounding_list), ("Curing", curing_list)]
-
-	for type, type_list in type_list_pairs:
-		for list_object in type_list:
-			mixer_no = int(list_object.select_mixer_no)
-			ingredient_name = list_object.ingredient
-
-			if ingredient_name != "Masterbatch":
-				for i in range (1, mixer_no + 1):
-					weight = getattr(list_object,"mixer_" + str(i))
-					if weight is not None:
-						ingredient_list.append({
-							"ingredient_type": type,
-							"ingredient": ingredient_name,
-							"ingredient_weight": weight,
-							"mixer_no": i,
-							"source_warehouse": None
-						})
-	
-	return ingredient_list
 
 # function to check whether every ingredient's own source_warehouse has enough
 # on-hand quantity before a Material Transfer is created.
