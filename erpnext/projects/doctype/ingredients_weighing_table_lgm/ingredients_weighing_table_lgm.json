@@ -26,7 +26,7 @@
     "in_list_view": 1,
     "label": "Ingredient Type",
     "read_only": 1
-  }
+  },
   {
    "fieldname": "mixer_no",
    "fieldtype": "Data",
