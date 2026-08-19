@@ -62,29 +62,6 @@ class JobCard(Document):
 
 		return existing[0] if existing else None
 
-	def get_required_items(self):
-		if not self.get('work_order'):
-			return
-
-		doc = frappe.get_doc('Work Order', self.get('work_order'))
-		if doc.transfer_material_against == 'Work Order' or doc.skip_transfer:
-			return
-
-		for d in doc.required_items:
-			if not d.operation:
-				frappe.throw(_("Row {0} : Operation is required against the raw material item {1}")
-					.format(d.idx, d.item_code))
-
-			if self.get('operation') == d.operation:
-				self.append('items', {
-					'item_code': d.item_code,
-					'source_warehouse': d.source_warehouse,
-					'uom': frappe.db.get_value("Item", d.item_code, 'stock_uom'),
-					'item_name': d.item_name,
-					'description': d.description,
-					'required_qty': (d.required_qty * flt(self.for_quantity)) / doc.qty
-				})
-
 	def on_submit(self):
 		self.validate_job_card()
 		self.update_work_order()
