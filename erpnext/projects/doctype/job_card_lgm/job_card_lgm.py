@@ -8,6 +8,7 @@ from frappe import _
 from frappe.utils import flt, time_diff_in_hours, get_datetime, time_diff, get_link_to_form
 from frappe.model.mapper import get_mapped_doc
 from frappe.model.document import Document
+from erpnext.projects.doctype.work_order_lgm.work_order_lgm import update_status as update_wo_status
 
 class JobCardLGM(Document):
 	def validate(self):
@@ -72,10 +73,6 @@ class JobCardLGM(Document):
 					'mixer_no': d.mixer_no
 				})
 
-
-	def on_submit(self):
-		self.validate_job_card()
-
 	def validate_job_card(self):
 		if not self.time_logs:
 			frappe.throw(_("Time logs are required for {0} {1}")
@@ -100,8 +97,26 @@ class JobCardLGM(Document):
 		if self.time_logs:
 			self.status = 'Work In Progress'
 
+		if (self.docstatus == 1 and self.for_quantity 
+	  		and self.total_completed_qty == self.for_quantity):
+			self.status = "Completed"
+
 		if update_status:
 			self.db_set('status', self.status)
+
+	def on_update(self):
+		self.update_work_order_status()
+
+	def on_submit(self):
+		self.validate_job_card()
+		self.update_work_order_status()
+
+	def on_cancel(self):
+		self.update_work_order_status()
+
+	def update_work_order_status(self):
+		if self.get('work_order'):
+			update_wo_status(self.work_order)
 
 @frappe.whitelist()
 def get_ingredients(doc):
