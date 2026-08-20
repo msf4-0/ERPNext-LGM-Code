@@ -73,10 +73,6 @@ class JobCardLGM(Document):
 					'mixer_no': d.mixer_no
 				})
 
-
-	def on_submit(self):
-		self.validate_job_card()
-
 	def validate_job_card(self):
 		if not self.time_logs:
 			frappe.throw(_("Time logs are required for {0} {1}")
