@@ -5,6 +5,7 @@
  "engine": "InnoDB",
  "field_order": [
   "ingredient",
+  "ingredient_type",
   "ingredient_weight",
   "mixer_no",
   "weighed",
@@ -17,38 +18,51 @@
    "in_list_view": 1,
    "label": "Ingredient",
    "options": "Item",
-   "read_only": 1
+   "read_only": 1,
+   "columns": 2
+  },
+  {
+    "fieldname": "ingredient_type",
+    "fieldtype": "Data",
+    "in_list_view": 1,
+    "label": "Ingredient Type",
+    "read_only": 1,
+   "columns": 2
   },
   {
    "fieldname": "mixer_no",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Mixer No",
-   "read_only": 1
+   "read_only": 1,
+   "columns": 1
   },
   {
    "fieldname": "ingredient_weight",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Weight",
-   "read_only": 1
+   "read_only": 1,
+   "columns": 1
   },
   {
    "fieldname": "weighed",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Weighed"
+   "label": "Weighed",
+   "columns": 1
   },
   {
    "fieldname": "source_warehouse",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Source Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "columns": 2
   }
  ],
  "istable": 1,
- "modified": "2024-01-07 16:18:04.413027",
+ "modified": "2026-08-19 16:18:04.413027",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Ingredients Weighing Table LGM",

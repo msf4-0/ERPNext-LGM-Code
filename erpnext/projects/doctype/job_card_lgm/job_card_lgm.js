@@ -3,6 +3,12 @@
 
 frappe.ui.form.on('Job Card LGM', {
 	setup: function(frm){
+		var df_type = frappe.meta.get_docfield("Ingredients Weighing Table LGM", 
+			"ingredient_type", frm.doc.name);
+		if (df_type) {
+			df_type.hidden = 1;
+		}
+
 		frm.call({
 			method: "get_all_job_card",
 			callback:function(r){

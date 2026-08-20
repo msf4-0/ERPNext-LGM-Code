@@ -19,7 +19,7 @@
   "production_item",
   "item_name",
   "for_quantity",
-  "mixer_no_job_card",
+  "ingredient_type",
   "wip_warehouse",
   "status",
   "column_break_12",
@@ -313,9 +313,10 @@
    "read_only": 1
   },
   {
-   "fieldname": "mixer_no_job_card",
-   "fieldtype": "Data",
-   "label": "Mixer No"
+    "fieldname": "ingredient_type",
+    "fieldtype": "Data",
+    "label": "Ingredient Type",
+    "read_only": 1
   }
  ],
  "is_submittable": 1,

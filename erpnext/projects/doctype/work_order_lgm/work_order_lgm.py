@@ -8,7 +8,7 @@ from frappe.model.document import Document
 from frappe import _
 
 class WorkOrderLGM(Document):
-	pass
+    pass
 
 @frappe.whitelist(allow_guest=True)
 def get_weight_from_nodered():
@@ -30,119 +30,93 @@ def get_weight_from_nodered():
 			return "found"
 	return "not found"
 
+def get_ingredients(doc):
+	"""
+	Returns a list of dicts of ingredients, based on their ingredient type.
+	"""
+	obj = doc.get("weighing_table_lgm", [])
+	output = {}
+
+	for row_data in obj:
+		ingredient_type = row_data.get("ingredient_type")
+
+		## Create new empty list if ingredient type is seen for first time
+		if ingredient_type not in output:
+			output[ingredient_type] = []
+
+		output[ingredient_type].append({
+			"ingredient": row_data.get("ingredient"),
+			"ingredient_weight": row_data.get("ingredient_weight"),
+			"mixer_no": row_data.get("mixer_no"),
+			"weighed": row_data.get("weighed"),
+			"source_warehouse": row_data.get("source_warehouse"),
+		})
+
+	return output
 
 @frappe.whitelist()
 def create_job_card_lgm(doc):
-	# parse to json object
-	doc = json.loads(doc)
-	# check if work order that is linked to the current request sheet already exists
-	if len(frappe.db.get_all('Job Card LGM', fields="work_order", filters={"work_order": doc["name"]})) > 0:
-		frappe.throw(_("Job Card for current work order already exists."))
-	else:
-		# get ingredients
-		ingredients_lists = get_ingredients(doc)
+    """
+    Creates Job Card LGM documents based on values filled in the doc.
+    One job card will be created per ingredient type.
+    """
+    doc = json.loads(doc)
+    ingredients_dict = get_ingredients(doc)
 
-		workstation_request_sheet = frappe.get_doc("Technological Request Sheets LGM", doc["request_sheet_link"]).factory_reference_no
-		mixing_instruction = frappe.get_doc("Technological Request Sheets LGM", doc["request_sheet_link"]).mixing_cycle
-		counter = 1
-		# populate child table 
-		for mixer in ingredients_lists:
-			# insert record
-			job_card_lgm = frappe.get_doc(dict(
-				doctype='Job Card LGM',
-				work_order = doc["name"],
-				request_sheet=doc["request_sheet_link"],
-				workstation = workstation_request_sheet,
-				for_quantity=1,
-				mixer_no_job_card=counter,
-				ingredients=mixer,
-				mixing_cycle=mixing_instruction
-			)).insert()
+    technological_request_sheet = frappe.get_doc("Technological Request Sheets LGM", doc["request_sheet_link"])
+    workstation_request_sheet = technological_request_sheet.factory_reference_no
+    mixing_instruction = technological_request_sheet.mixing_cycle
 
-			job_card_lgm.save()
-			counter += 1
+    # Rebuild the list as dictionaries to prevent parent theft
+    new_mixing_cycle = []
+    for instruction in mixing_instruction:
+        new_mixing_cycle.append({
+            "mixing_time": instruction.mixing_time,
+            "mixing_process": instruction.mixing_process
+        })
 
-	return True
+    job_cards = []
+    created_count = 0
+    valid_types_count = 0 # Track valid attempts to prevent failing on empty payloads
 
-def get_ingredients(doc):
-	obj = doc["weighing_table_lgm"]
-	no_of_mixer = 0
-	initial_mixer = None
-	for data in obj:
-		if initial_mixer is None:
-			initial_mixer = int(data["mixer_no"])
-			no_of_mixer += 1
-		else:
-			if int(data["mixer_no"]) == initial_mixer:
-				break
-			else:
-				no_of_mixer += 1
+    for ingredient_type, ingredients_list in ingredients_dict.items():
+        if not ingredient_type:
+            frappe.throw(_("Ingredient type not present for ingredients {0}".format(ingredients_list)))
 
-	output = [[] for _ in range (no_of_mixer)]
-	for data in obj:
-		output[int(data["mixer_no"])-1].append({
-			"ingredient": data["ingredient"],
-			"ingredient_weight": data["weighed"],
-			"mixer_no": data["mixer_no"],
-			"weighed": data["weighed"],
-		})
-	return output
+        if not ingredients_list:
+            continue
+            
+        valid_types_count += 1
 
+        # Skip gracefully instead of aborting the entire process
+        if frappe.db.exists("Job Card LGM", {
+            "work_order": doc.get("name"),
+            "ingredient_type": ingredient_type
+        }):
+            continue 
 
-@frappe.whitelist()
-def create_work_order_lgm(doc):
-	# parse to json object
-	doc = json.loads(doc)
+        job_card_lgm = frappe.get_doc(dict(
+            doctype = 'Job Card LGM',
+            work_order = doc["name"],
+            request_sheet = doc["request_sheet_link"],
+            workstation = workstation_request_sheet,
+            for_quantity = 1,
+            ingredient_type = ingredient_type,
+            ingredients = ingredients_list,
+            mixing_cycle = new_mixing_cycle
+        ))
 
-	request_sheet_doc = frappe.get_doc("Technological Request Sheets LGM", doc["request_sheet_link"])
-	# get ingredients
-	ingredients_lists = get_ingredients_from_request_sheet(request_sheet_doc)
+        job_cards.append(job_card_lgm)
+        created_count += 1
 
-	# populate child table 
-	table_list = []
-	for ingredient in ingredients_lists:
-		for ingredient_details in ingredient:
-			table_list.append(
-				{
-					"ingredient": ingredient_details[0],
-					"ingredient_weight": ingredient_details[1],
-					"mixer_no": ingredient_details[2],
-					"source_warehouse": None
-				}
-			)
+    # Only throw if we had valid items to process, but none were actually created
+    if valid_types_count > 0 and created_count == 0:
+        frappe.throw(_("All Job Cards for Work Order {0} already exist.").format(doc.get("name")))
 
-	# insert record
-	doc["weighing_table_lgm"] = table_list
-	return doc
+    for job_card_lgm in job_cards:
+        job_card_lgm.insert()
 
-def get_ingredients_from_request_sheet(doc):
-	# get ingredients from commpounding ingredients child table
-	ingredient_list = []
-	compounding_list_object = doc.compounding_ingredients
-	for list_object in compounding_list_object:
-		mixer_no = int(list_object.select_mixer_no)
-		ingredient_name = list_object.ingredient
-		if ingredient_name != "Masterbatch":
-			ingredient = []
-			for i in range (1, mixer_no+1):
-				if getattr(list_object,"mixer_" + str(i)) is not None:
-					ingredient_weight = getattr(list_object,"mixer_" + str(i))
-					ingredient.append((ingredient_name, ingredient_weight, i))
-			ingredient_list.append(ingredient)
-
-	# get ingredients from curing ingredients child table
-	curing_list_object = doc.curing_ingredients
-	for list_object in curing_list_object:
-		mixer_no = int(list_object.select_mixer_no)
-		ingredient_name = list_object.ingredient
-		if ingredient_name != "Masterbatch":
-			ingredient = []
-			for i in range (1, mixer_no+1):
-				if getattr(list_object,"mixer_" + str(i)) is not None:
-					ingredient_weight = getattr(list_object,"mixer_" + str(i))
-					ingredient.append((ingredient_name, ingredient_weight, i))
-			ingredient_list.append(ingredient)
-	return ingredient_list
+    return True
 
 # function to check whether every ingredient's own source_warehouse has enough
 # on-hand quantity before a Material Transfer is created.

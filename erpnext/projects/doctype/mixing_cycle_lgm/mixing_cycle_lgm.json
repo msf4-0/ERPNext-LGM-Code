@@ -10,7 +10,7 @@
  "fields": [
   {
    "fieldname": "mixing_time",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Mixing Time (minute)",
    "reqd": 1
