@@ -290,4 +290,9 @@ def update_status(work_order_name):
 
 	frappe.db.set_value("Work Order LGM", work_order_name, "status", new_status)
 
+	frappe.publish_realtime(
+		event="work_order_lgm_status_changed",
+		message={"work_order": work_order_name, "status": new_status}
+	)
+
 	
