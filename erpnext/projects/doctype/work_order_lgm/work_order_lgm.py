@@ -263,3 +263,31 @@ def get_all_work_order():
 		if forms.request_sheet_link not in output:
 			output.append(forms.request_sheet_link)
 	return output
+
+def update_status(work_order_name):
+	"""
+	Updates the Work Order's status based on the status of its job cards.
+
+	Rules:
+	- Started <- No non-cancelled job cards exist, or job cards are open
+	- Completed <- Every non-cancelled job card is completed
+	- In progress <- Everything else
+	"""
+	CANCELLED_STATUS_NUM = 2
+
+	job_cards = frappe.get_all(
+		"Job Card LGM",
+		filters = {"work_order": work_order_name, "docstatus": ["!=", CANCELLED_STATUS_NUM]},
+		fields = ["status"]
+	)
+
+	if not job_cards or all(jc.status == "Open" for jc in job_cards):
+		new_status = "Not Started"
+	elif all(jc.status == "Completed" for jc in job_cards):
+		new_status = "Completed"
+	else:
+		new_status = "In Progress"
+
+	frappe.db.set_value("Work Order LGM", work_order_name, "status", new_status)
+
+	
