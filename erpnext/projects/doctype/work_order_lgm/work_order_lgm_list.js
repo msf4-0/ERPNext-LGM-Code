@@ -5,7 +5,7 @@ frappe.listview_settings['Work Order LGM'] = {
   get_indicator: function (doc) {
     var status_colors = {
       'Not Started': 'orange',
-      'In Process': 'blue',
+      'In Progress': 'blue',
       'Completed': 'green',
     };
     var color = status_colors[doc.status] || 'grey';
