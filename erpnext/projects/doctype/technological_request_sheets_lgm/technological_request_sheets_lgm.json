@@ -115,8 +115,7 @@
   {
    "fieldname": "compounding_ingredients",
    "fieldtype": "Table",
-   "options": "Compounding Ingredients LGM",
-   "reqd": 1
+   "options": "Compounding Ingredients LGM"
   },
   {
    "fieldname": "section_mixer",
@@ -333,8 +332,7 @@
   {
    "fieldname": "curing_ingredients",
    "fieldtype": "Table",
-   "options": "Curing Ingredients LGM",
-   "reqd": 1
+   "options": "Curing Ingredients LGM"
   },
   {
    "fieldname": "reference_no",

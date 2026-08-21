@@ -118,39 +118,18 @@ def create_job_card_lgm(doc):
 
     return True
 
-# function to check whether every ingredient's own source_warehouse has enough
-# on-hand quantity before a Material Transfer is created.
-# Groups by (ingredient, source_warehouse) rather than just ingredient, because
-# the same ingredient can now legitimately be sourced from two different
-# warehouses across two rows (e.g. two different mixers).
-# Returns a list of shortfalls (empty list = everything is sufficient), each:
-#   {"ingredient": ..., "source_warehouse": ..., "needed": ..., "available": ...}
-@frappe.whitelist()
-def check_stock_availability(doc):
-	doc = json.loads(doc)
-	ingredient_list = doc["weighing_table_lgm"]
-
-	# sum up the required weight per (ingredient, source_warehouse) pair,
-	# since the same pair can appear on multiple rows (e.g. different mixers)
-	weights = {}
-	for row in ingredient_list:
-		ingredient_name = row["ingredient"]
-		source_warehouse = row.get("source_warehouse")
-		if not source_warehouse:
-			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
-		key = (ingredient_name, source_warehouse)
-		weights[key] = weights.get(key, 0) + float(row["weighed"])
-
-	# check each (ingredient, source_warehouse) pair's actual on-hand quantity
-	# via the Bin doctype, which is where ERPNext/Frappe tracks per-item,
-	# per-warehouse stock levels
+def _get_stock_shortfalls(weights):
+	"""
+	Returns a list of stocks that have shortfalls (insufficient stock).
+	"""
 	shortfalls = []
 	for (ingredient_name, source_warehouse), needed_qty in weights.items():
-		bin_qty = frappe.db.get_value(
+		bin_qty = frappe.get_value(
 			"Bin",
 			{"item_code": ingredient_name, "warehouse": source_warehouse},
 			"actual_qty"
 		) or 0
+
 		if bin_qty < needed_qty:
 			shortfalls.append({
 				"ingredient": ingredient_name,
@@ -176,17 +155,7 @@ def create_material_transfer(doc, warehouse_overrides=None):
 	else:
 		warehouse_overrides = {}
 
-	# if a Material Transfer stock entry already exists for this work order,
-	# do not create a duplicate — return False so the caller can stop and warn
-	existing = frappe.get_list(
-		"Stock Entry",
-		fields="name",
-		filters={"work_order_lgm": doc["name"], "stock_entry_type": "Material Transfer"}
-	)
-	if len(existing) > 0:
-		return False
-
-	ingredient_list = doc["weighing_table_lgm"]
+	ingredient_list = doc.get("weighing_table_lgm", [])
 	weights = {}
 	# summing up the weights based on (ingredient, source_warehouse) — the
 	# override, if the human picked a fallback for this ingredient, wins over
@@ -196,8 +165,13 @@ def create_material_transfer(doc, warehouse_overrides=None):
 		source_warehouse = warehouse_overrides.get(ingredient_name) or row.get("source_warehouse")
 		if not source_warehouse:
 			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
-		key = (ingredient_name, source_warehouse)
-		weights[key] = weights.get(key, 0) + float(row["weighed"])
+
+		if row.get("weighed"):
+			key = (ingredient_name, source_warehouse)
+			weights[key] = weights.get(key, 0) + float(row["weighed"])
+
+	if not weights:
+		return True
 
 	# re-check availability against the *final resolved* warehouse for each
 	# ingredient (its own source_warehouse, or the human-provided override).
@@ -206,20 +180,7 @@ def create_material_transfer(doc, warehouse_overrides=None):
 	# knowing whether a fallback warehouse the human just picked is itself
 	# short. Same shape of result as check_stock_availability, so the caller
 	# can reuse the same dialog logic if this comes back non-empty.
-	shortfalls = []
-	for (ingredient_name, source_warehouse), needed_qty in weights.items():
-		bin_qty = frappe.db.get_value(
-			"Bin",
-			{"item_code": ingredient_name, "warehouse": source_warehouse},
-			"actual_qty"
-		) or 0
-		if bin_qty < needed_qty:
-			shortfalls.append({
-				"ingredient": ingredient_name,
-				"source_warehouse": source_warehouse,
-				"needed": needed_qty,
-				"available": bin_qty
-			})
+	shortfalls = _get_stock_shortfalls(weights)
 	if shortfalls:
 		return shortfalls
 
