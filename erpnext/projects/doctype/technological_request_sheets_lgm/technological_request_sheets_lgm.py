@@ -49,6 +49,9 @@ def _ensure_item_group_exists(item_group_name):
 @frappe.whitelist()
 def calculate_waste(doc):
 	doc = json.loads(doc)
+
+	if not (doc.get("compounding_ingredients") and doc.get("curing_ingredients")):
+		return 0
 		
 	mb = doc["compounding_ingredients"][len(doc["compounding_ingredients"]) -1]
 	curing = doc["curing_ingredients"][0]

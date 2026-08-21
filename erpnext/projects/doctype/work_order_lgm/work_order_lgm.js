@@ -68,15 +68,13 @@ frappe.ui.form.on('Work Order LGM', {
 	},
 
 	before_submit(frm) {
-		var ingredients_list = frm.doc['weighing_table_lgm'];
+		var ingredients_list = frm.doc['weighing_table_lgm'] || [];
 		var no_of_ingredients = frm.doc['weighing_table_lgm'].length;
 		for (var i = 0; i < no_of_ingredients; i++) {
 			if (ingredients_list[i]['weighed'] == undefined) {
 				frm.reload_doc();
 				frappe.throw({
-					message: __(
-						`Ingredient ${i + 1} weight is not measured yet.`,
-					),
+					message: __(`Ingredient ${i + 1} weight is not measured yet.`),
 					indicator: 'red',
 				});
 			}
@@ -94,122 +92,71 @@ frappe.ui.form.on('Work Order LGM', {
 		// Frappe proceeds with the submit — same reasoning as the before_save fix.
 		return frm
 			.call({
-				method: 'check_stock_availability',
+				method: 'create_material_transfer',
 				args: { doc: frm.doc },
 			})
 			.then((r) => {
-				var shortfalls = r.message || [];
+				var response = r.message;
 
-				if (shortfalls.length === 0) {
-					// every ingredient has enough stock in its own source warehouse —
-					// create the transfer straight away
-					return frm
-						.call({
-							method: 'create_material_transfer',
-							args: { doc: frm.doc },
-						})
-						.then((r2) => {
-							if (r2.message === false) {
-								frappe.throw({
-									message: __(
-										'A Material Transfer for this Work Order already exists.',
-									),
-									indicator: 'red',
-								});
-							} else if (r2.message !== true) {
-								// stock changed between the two checks above and this
-								// ingredient is short after all — rare, but don't
-								// silently let submission through
-								frappe.throw({
-									message: __(
-										'Stock changed just now and is no longer sufficient. Please try submitting again.',
-									),
-									indicator: 'red',
-								});
-							}
-						});
+				if (response === true || response === 'NO_MATERIALS') {
+					return;
 				}
 
-				// one or more ingredients are short — ask a human to pick a fallback
-				// warehouse for each one before the transfer is created
-				return new Promise((resolve, reject) => {
-					var dialog = new frappe.ui.Dialog({
-						title: __(
-							'Insufficient Stock — Choose Fallback Warehouses',
+				if (response === false) {
+					frappe.throw({
+						message: __(
+							'A Material Transfer for this Work Order already exists.',
 						),
-						fields: shortfalls.map((s, idx) => ({
-							fieldname: 'warehouse_' + idx,
-							fieldtype: 'Link',
-							options: 'Warehouse',
-							label: __(
-								`${s.ingredient}: needs ${s.needed}, only ${s.available} in ${s.source_warehouse}`,
-							),
-							reqd: 1,
-						})),
-						primary_action_label: __('Confirm & Transfer'),
-						primary_action: (values) => {
-							var overrides = {};
-							shortfalls.forEach((s, idx) => {
-								overrides[s.ingredient] =
-									values['warehouse_' + idx];
-							});
-							frm.call({
-								method: 'create_material_transfer',
-								args: {
-									doc: frm.doc,
-									warehouse_overrides: overrides,
-								},
-							})
-								.then((r) => {
-									if (r.message === true) {
-										dialog.hide();
-										resolve();
-									} else if (r.message === false) {
-										dialog.hide();
-										reject(
-											new Error(
-												__(
-													'A Material Transfer for this Work Order already exists.',
-												),
-											),
-										);
-									} else {
-										// still short — the chosen fallback warehouse(s)
-										// don't have enough either. Keep the dialog open
-										// and tell the human which ones, instead of
-										// silently creating a transfer that would fail
-										// or go negative.
-										var still_short = (r.message || [])
-											.map((s) =>
-												__(
-													`${s.ingredient} in ${s.source_warehouse}: needs ${s.needed}, only ${s.available} available`,
-												),
-											)
-											.join('<br>');
-										frappe.msgprint({
-											title: __('Still Insufficient'),
-											message:
-												__(
-													"The warehouse(s) you picked don't have enough stock either:",
-												) +
-												'<br>' +
-												still_short,
-											indicator: 'red',
-										});
-									}
-								})
-								.catch(reject);
+						indicator: 'red',
+					});
+				}
+
+				// one or more ingredients are short
+				return new Promise((resolve, reject) => {
+					var shortfall_html = shortfalls
+						.map(
+							(s) =>
+								`<li><b>${s.ingredient}:</b> needs ${s.needed}, only ${s.available} in ${s.source_warehouse}</li>`,
+						)
+						.join('');
+
+					var dialog = new frappe.ui.Dialog({
+						title: __('Insufficient Stock'),
+						fields: [
+							{
+								fieldname: 'shortfall_info',
+								fieldtype: 'HTML',
+								options: `<p>The following ingredients lack sufficient stock:</p>
+										<ul>${shortfall_html}</ul>
+										<p>You can manually change the source warehouse, 
+										or initiate a material tranfer</p>`,
+							},
+						],
+
+						primary_action_label: __('Manual Material Transfer'),
+						primary_action: () => {
+							dialog.hide();
+
+							frappe.route_options = {
+								stock_entry_type: 'Material Transfer',
+								work_order_lgm: frm.doc.name,
+							};
+
+							frappe.new_doc('Stock Entry');
 						},
 					});
-					dialog.get_close_btn().on('click', () => {
+
+					dialog.onhide = () => {
 						reject(
 							new Error(
 								__(
-									'Submission cancelled — stock shortfalls were not resolved.',
+									`Submission cancelled - please resolve 
+										insufficient stock or create a transfer.`,
 								),
 							),
 						);
-					});
+					};
+
 					dialog.show();
 				});
 			});
