@@ -90,12 +90,22 @@ frappe.ui.form.on('Work Order LGM', {
 
 		// The outer Promise safely pauses the save/submit event
 		return new Promise((resolve, reject) => {
-			const cancel_submission = () => {
+			const cancel_submission = (err_msg) => {
+				// 1. Safely unlock the UI
 				if (frm.page && frm.page.btn_primary) {
 					frm.enable_save();
 					frm.page.btn_primary.removeClass('disabled');
 					frm.page.btn_primary.prop('disabled', false);
 				}
+
+				if (err_msg) {
+					frappe.msgprint({
+						title: __('Submission Halted'),
+						message: err_msg,
+						indicator: 'red',
+					});
+				}
+
 				reject('cancel');
 			};
 
@@ -105,12 +115,18 @@ frappe.ui.form.on('Work Order LGM', {
 				callback: (r) => {
 					var response = r.message;
 
-					// Success path
-					if (response === true) {
+					if (response === true || response === 'NO_MATERIALS') {
 						return resolve();
 					}
 
-					// Handle Shortfalls
+					if (response === false) {
+						return cancel_submission(
+							__(
+								'A Material Transfer for this Work Order already exists.',
+							),
+						);
+					}
+
 					var shortfall_html = response
 						.map(
 							(s) =>
@@ -143,28 +159,54 @@ frappe.ui.form.on('Work Order LGM', {
 							};
 
 							frappe.new_doc('Stock Entry');
+
 							cancel_submission();
 						},
 					});
 
 					dialog.$wrapper.on('hidden.bs.modal', function () {
 						if (!is_routing) {
-							frappe.msgprint({
-								title: __('Cancelled'),
-								message: __(
+							cancel_submission(
+								__(
 									'Submission cancelled - Please choose different warehouses or initiate a material transfer',
 								),
-								indicator: 'red',
-							});
+							);
+						} else {
+							cancel_submission();
 						}
-						cancel_submission();
 					});
 
 					dialog.show();
 				},
 				error: (r) => {
-					// Safely unlock the UI if the backend throws a 500 or times out
-					cancel_submission();
+					let actual_error = null;
+
+					// 1. Check for user-facing errors thrown via Python's frappe.throw()
+					if (r && r._server_messages) {
+						try {
+							let msg_list = JSON.parse(r._server_messages);
+							let msg_obj =
+								typeof msg_list[0] === 'string'
+									? JSON.parse(msg_list[0])
+									: msg_list[0];
+							actual_error = msg_obj.message || msg_obj;
+						} catch (e) {
+							// Fallback if JSON parsing fails
+						}
+					}
+
+					// 2. Fallback to raw exception / execution error if no message was parsed
+					if (!actual_error && r && r.exc) {
+						actual_error = __(
+							'A server error occurred. Check the Error Log for details.',
+						);
+					}
+
+					// 3. Unlock the form and present the actual backend message
+					cancel_submission(
+						actual_error ||
+							__('An unknown network or server error occurred.'),
+					);
 				},
 			});
 		});
