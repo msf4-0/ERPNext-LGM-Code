@@ -88,37 +88,37 @@ frappe.ui.form.on('Work Order LGM', {
 			}
 		}
 
-		// before_submit must wait for these server round-trips to finish before
-		// Frappe proceeds with the submit — same reasoning as the before_save fix.
-		return frm
-			.call({
+		// The outer Promise safely pauses the save/submit event
+		return new Promise((resolve, reject) => {
+			const cancel_submission = () => {
+				if (frm.page && frm.page.btn_primary) {
+					frm.enable_save();
+					frm.page.btn_primary.removeClass('disabled');
+					frm.page.btn_primary.prop('disabled', false);
+				}
+				reject('cancel');
+			};
+
+			frm.call({
 				method: 'create_material_transfer',
 				args: { doc: frm.doc },
-			})
-			.then((r) => {
-				var response = r.message;
+				callback: (r) => {
+					var response = r.message;
 
-				if (response === true || response === 'NO_MATERIALS') {
-					return;
-				}
+					// Success path
+					if (response === true) {
+						return resolve();
+					}
 
-				if (response === false) {
-					frappe.throw({
-						message: __(
-							'A Material Transfer for this Work Order already exists.',
-						),
-						indicator: 'red',
-					});
-				}
-
-				// one or more ingredients are short
-				return new Promise((resolve, reject) => {
-					var shortfall_html = shortfalls
+					// Handle Shortfalls
+					var shortfall_html = response
 						.map(
 							(s) =>
 								`<li><b>${s.ingredient}:</b> needs ${s.needed}, only ${s.available} in ${s.source_warehouse}</li>`,
 						)
 						.join('');
+
+					var is_routing = false;
 
 					var dialog = new frappe.ui.Dialog({
 						title: __('Insufficient Stock'),
@@ -127,14 +127,14 @@ frappe.ui.form.on('Work Order LGM', {
 								fieldname: 'shortfall_info',
 								fieldtype: 'HTML',
 								options: `<p>The following ingredients lack sufficient stock:</p>
-										<ul>${shortfall_html}</ul>
-										<p>You can manually change the source warehouse, 
-										or initiate a material tranfer</p>`,
+									<ul>${shortfall_html}</ul>
+									<p>You can manually change the source warehouse, 
+									or initiate a material tranfer</p>`,
 							},
 						],
-
 						primary_action_label: __('Manual Material Transfer'),
 						primary_action: () => {
+							is_routing = true;
 							dialog.hide();
 
 							frappe.route_options = {
@@ -143,23 +143,31 @@ frappe.ui.form.on('Work Order LGM', {
 							};
 
 							frappe.new_doc('Stock Entry');
+							cancel_submission();
 						},
 					});
 
-					dialog.onhide = () => {
-						reject(
-							new Error(
-								__(
-									`Submission cancelled - please resolve 
-										insufficient stock or create a transfer.`,
+					dialog.$wrapper.on('hidden.bs.modal', function () {
+						if (!is_routing) {
+							frappe.msgprint({
+								title: __('Cancelled'),
+								message: __(
+									'Submission cancelled - Please choose different warehouses or initiate a material transfer',
 								),
-							),
-						);
-					};
+								indicator: 'red',
+							});
+						}
+						cancel_submission();
+					});
 
 					dialog.show();
-				});
+				},
+				error: (r) => {
+					// Safely unlock the UI if the backend throws a 500 or times out
+					cancel_submission();
+				},
 			});
+		});
 	},
 });
 
