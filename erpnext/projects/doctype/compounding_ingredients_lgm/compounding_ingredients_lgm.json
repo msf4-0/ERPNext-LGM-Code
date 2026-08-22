@@ -6,7 +6,6 @@
  "field_order": [
   "ingredient",
   "col_break_ingredient",
-  "ingredient_density",
   "select_mixer_no",
   "section_break",
   "mixer_1",
@@ -151,13 +150,6 @@
   {
    "fieldname": "col_break_ingredient",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "ingredient_density",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Ingredient Density",
-   "reqd": 1
   },
   {
    "fieldname": "formulation_mixer_1",
