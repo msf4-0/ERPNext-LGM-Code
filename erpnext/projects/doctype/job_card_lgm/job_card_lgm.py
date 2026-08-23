@@ -161,3 +161,97 @@ def get_all_job_card():
 		if forms.work_order not in output:
 			output.append(forms.work_order)
 	return output
+
+# function to create the Material Transfer stock entry for a work order.
+# warehouse_overrides is an optional {ingredient: fallback_warehouse} map —
+# populated by the user when check_stock_availability found that ingredient's
+# normal source_warehouse short, and they picked a different warehouse to
+# pull from instead. Any ingredient not in the map uses its own row-level
+# source_warehouse as usual.
+@frappe.whitelist()
+def create_material_issue(doc):
+	doc = json.loads(doc)
+	wip = _get_wip_warehouse()
+
+	ingredient_list = doc.get("ingredients", [])
+	weights = {}
+	# summing up the weights based on (ingredient, source_warehouse) — the
+	# override, if the human picked a fallback for this ingredient, wins over
+	# the row's own source_warehouse
+	for row in ingredient_list:
+		if row.get("weighed"):
+			ingredient_name = row.get("ingredient")
+			key = ingredient_name
+			weights[key] = weights.get(key, 0) + float(row["weighed"])
+
+	if not weights:
+		return True
+
+	# re-check availability against the *final resolved* warehouse for each
+	# ingredient (its own source_warehouse, or the human-provided override).
+	# This is necessary because the earlier check_stock_availability call only
+	# ever validated each row's original source_warehouse — it has no way of
+	# knowing whether a fallback warehouse the human just picked is itself
+	# short. Same shape of result as check_stock_availability, so the caller
+	# can reuse the same dialog logic if this comes back non-empty.
+	shortfalls = _get_stock_shortfalls(weights)
+	if shortfalls:
+		return shortfalls
+
+	# put each (ingredient, source_warehouse) pair and its total weight into
+	# the stock entry's item rows
+	stock_entry_details = []
+	for ingredient_name, ingredient_weight in weights.items():
+		stock_entry_details.append(dict(
+			s_warehouse = wip,
+			item_code = ingredient_name,
+			qty = ingredient_weight
+		))
+
+	# insert stock entry record here — no single header-level from_warehouse
+	# any more, since source warehouses now differ per row
+	stock_entry = frappe.get_doc(dict(
+		doctype = "Stock Entry",
+		stock_entry_type = "Material Issue",
+		work_order_lgm = doc["work_order"],
+		from_warehouse = wip,
+		items = stock_entry_details,
+	)).insert()
+	stock_entry.submit()
+	return True
+
+def _get_wip_warehouse(whouse_name = "Work In Progress"):
+	warehouses = frappe.get_all("Warehouse", fields="name")
+	wip = None
+	for warehouse in warehouses:
+		if whouse_name in warehouse["name"]:
+			wip = warehouse["name"]
+
+	if not wip:
+		frappe.throw(_("ERROR: No warehouse with name {0} found.").format(whouse_name))
+
+	return wip
+
+def _get_stock_shortfalls(weights):
+	"""
+	Returns a list of stocks that have shortfalls (insufficient stock).
+	"""
+	shortfalls = []
+	wip_whouse = _get_wip_warehouse()
+
+	for ingredient_name, needed_qty in weights.items():
+		bin_qty = frappe.get_value(
+			"Bin",
+			{"item_code": ingredient_name, "warehouse": wip_whouse},
+			"actual_qty"
+		) or 0
+
+		if bin_qty < needed_qty:
+			shortfalls.append({
+				"ingredient": ingredient_name,
+				"source_warehouse": wip_whouse,
+				"needed": needed_qty,
+				"available": bin_qty
+			})
+
+	return shortfalls
