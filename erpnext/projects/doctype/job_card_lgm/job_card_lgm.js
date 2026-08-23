@@ -50,6 +50,15 @@ frappe.ui.form.on('Job Card LGM', {
 			df_type.hidden = 1;
 		}
 
+		var df_weight = frappe.meta.get_docfield(
+			'Ingredients Weighing Table LGM',
+			'weighed',
+			frm.doc.name,
+		);
+		if (df_weight) {
+			df_weight.reqd = 1;
+		}
+
 		var df_warehouse = frappe.meta.get_docfield(
 			'Ingredients Weighing Table LGM',
 			'source_warehouse',
