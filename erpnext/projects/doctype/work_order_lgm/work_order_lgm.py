@@ -30,27 +30,34 @@ def get_weight_from_nodered():
 			return "found"
 	return "not found"
 
+def build_ingredient_row(row_data):
+	"""
+	Single source of truth for the row shape used both when Job Cards are first
+	created (grouped by ingredient_type, from the Work Order's own child table)
+	and when a Job Card's form re-syncs against the live Work Order
+	(job_card_lgm.get_ingredients). Works with either a plain dict (client-sent
+	doc) or a live Frappe child-table row, since both support .get().
+	"""
+	return {
+		"ingredient": row_data.get("ingredient"),
+		"ingredient_weight": row_data.get("ingredient_weight"),
+		"mixer_no": row_data.get("mixer_no"),
+		"weighed": row_data.get("weighed"),
+		"source_warehouse": row_data.get("source_warehouse"),
+	}
+
 def get_ingredients(doc):
 	"""
-	Returns a list of dicts of ingredients, based on their ingredient type.
+	Returns a dict of ingredient lists, grouped by ingredient_type.
 	"""
 	obj = doc.get("weighing_table_lgm", [])
 	output = {}
 
 	for row_data in obj:
 		ingredient_type = row_data.get("ingredient_type")
-
-		## Create new empty list if ingredient type is seen for first time
 		if ingredient_type not in output:
 			output[ingredient_type] = []
-
-		output[ingredient_type].append({
-			"ingredient": row_data.get("ingredient"),
-			"ingredient_weight": row_data.get("ingredient_weight"),
-			"mixer_no": row_data.get("mixer_no"),
-			"weighed": row_data.get("weighed"),
-			"source_warehouse": row_data.get("source_warehouse"),
-		})
+		output[ingredient_type].append(build_ingredient_row(row_data))
 
 	return output
 
@@ -166,9 +173,9 @@ def create_material_transfer(doc, warehouse_overrides=None):
 		if not source_warehouse:
 			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
 
-		if row.get("weighed"):
+		if row.get("ingredient_weight"):
 			key = (ingredient_name, source_warehouse)
-			weights[key] = weights.get(key, 0) + float(row["weighed"])
+			weights[key] = weights.get(key, 0) + float(row["ingredient_weight"])
 
 	if not weights:
 		return True

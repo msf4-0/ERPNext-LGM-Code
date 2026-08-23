@@ -8,7 +8,10 @@ from frappe import _
 from frappe.utils import flt, time_diff_in_hours, get_datetime, time_diff, get_link_to_form
 from frappe.model.mapper import get_mapped_doc
 from frappe.model.document import Document
-from erpnext.projects.doctype.work_order_lgm.work_order_lgm import update_status as update_wo_status
+from erpnext.projects.doctype.work_order_lgm.work_order_lgm import (
+    update_status as update_wo_status,
+    build_ingredient_row
+)
 
 class JobCardLGM(Document):
 	def validate(self):
@@ -131,13 +134,7 @@ def get_ingredients(doc):
 	ingredient_list = []
 	for d in work_order_doc.weighing_table_lgm:
 		if doc.get('ingredient_type') and doc.get('ingredient_type') == d.get('ingredient_type'):
-			ingredient_list.append({
-				'ingredient': d.ingredient,
-				'ingredient_weight': d.weighed,
-				'mixer_no': d.mixer_no,
-				'weighed': d.weighed,
-				'source_warehouse': d.source_warehouse
-			})
+			ingredient_list.append(build_ingredient_row(d))
 		
 	return ingredient_list
 
