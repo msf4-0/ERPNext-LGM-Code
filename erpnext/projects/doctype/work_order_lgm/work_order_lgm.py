@@ -349,9 +349,59 @@ def update_status(work_order_name):
 
 	frappe.db.set_value("Work Order LGM", work_order_name, "status", new_status)
 
+	if new_status == "Completed":
+		_issue_finished_goods(work_order_name)
+
 	frappe.publish_realtime(
 		event="work_order_lgm_status_changed",
 		message={"work_order": work_order_name, "status": new_status}
 	)
 
-	
+def _issue_finished_goods(work_order_name):
+    work_order = frappe.get_doc("Work Order LGM", work_order_name)
+    request_sheet = frappe.get_doc("Technological Request Sheets LGM", work_order.request_sheet_link)
+    
+    fg_warehouse = _get_finished_goods_warehouse()
+    
+    # Items were created with the format: reference_no/1, reference_no/2, etc.
+    item_code_prefix = request_sheet.reference_no + "/"
+    
+    # Query all items that start with this exact prefix
+    created_items = frappe.get_all(
+        "Item", 
+        filters={"item_code": ["like", f"{item_code_prefix}%"]}, 
+        fields=["item_code"]
+    )
+
+    # Build the stock entry rows
+    stock_entry_details = []
+    for item in created_items:
+        stock_entry_details.append({
+            "t_warehouse": fg_warehouse,
+            "item_code": item.item_code,
+            "qty": 1
+        })
+
+    # Create and submit the Material Receipt
+    stock_entry = frappe.get_doc({
+        "doctype": "Stock Entry",
+        "stock_entry_type": "Material Receipt", 
+        "work_order_lgm": work_order_name,
+        "to_warehouse": fg_warehouse,
+        "items": stock_entry_details
+    }).insert()
+    
+    stock_entry.submit()
+
+def _get_finished_goods_warehouse():
+    # Use a SQL wildcard to match "Finished Goods" followed by anything (like the company abbreviation)
+    warehouses = frappe.get_all(
+        "Warehouse", 
+        filters={"name": ["like", "Finished Goods%"]}, 
+        fields=["name"]
+    )
+    
+    if not warehouses:
+        frappe.throw(_("Cannot find a Finished Goods warehouse in the system."))
+        
+    return warehouses[0]["name"]	
