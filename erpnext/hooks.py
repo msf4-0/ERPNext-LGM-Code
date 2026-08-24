@@ -69,7 +69,7 @@ fixtures = [
 	{
 		"doctype": "Custom Field",
 		"filters": [
-			["name", "in", ["Stock Entry-work_order_lgm"]]
+			["name", "in", ["Stock Entry-work_order_lgm", "Job Card Time Log-employee"]]
 		]
 	}
 ]

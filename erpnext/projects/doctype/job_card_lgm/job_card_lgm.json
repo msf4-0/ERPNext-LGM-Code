@@ -148,14 +148,14 @@
    "fieldname": "employee",
    "fieldtype": "Link",
    "in_standard_filter": 1,
-   "label": "Employee",
+   "label": "Last Employee",
    "options": "Employee"
   },
   {
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Read Only",
-   "label": "Employee Name"
+   "label": "Last Employee Name"
   },
   {
    "default": "Open",
@@ -298,7 +298,8 @@
   {
    "fieldname": "ingredients",
    "fieldtype": "Table",
-   "options": "Ingredients Weighing Table LGM"
+   "options": "Ingredients Weighing Table LGM",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_instruction",
@@ -312,14 +313,14 @@
    "read_only": 1
   },
   {
-    "fieldname": "ingredient_type",
-    "fieldtype": "Data",
-    "label": "Ingredient Type",
-    "read_only": 1
+   "fieldname": "ingredient_type",
+   "fieldtype": "Data",
+   "label": "Ingredient Type",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2024-01-08 10:23:23.171165",
+ "modified": "2026-08-24 14:54:28.414382",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Job Card LGM",

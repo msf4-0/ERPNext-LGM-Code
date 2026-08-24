@@ -86,9 +86,8 @@ frappe.ui.form.on('Job Card LGM', {
 						(d) => {
 							if (d.employee) {
 								frm.set_value('employee', d.employee);
-							} else {
-								frm.events.start_job(frm);
 							}
+							frm.events.start_job(frm);
 						},
 						__('Enter Value'),
 						__('Start'),
@@ -142,6 +141,7 @@ frappe.ui.form.on('Job Card LGM', {
 			'time_logs',
 		);
 		row.from_time = frappe.datetime.now_datetime();
+		row.employee = frm.doc.employee;
 		frm.set_value('job_started', 1);
 		frm.set_value('started_time', row.from_time);
 		frm.set_value('status', 'Work In Progress');
@@ -159,7 +159,14 @@ frappe.ui.form.on('Job Card LGM', {
 
 	complete_job: function (frm, completed_time, completed_qty) {
 		frm.doc.time_logs.forEach((d) => {
-			if (d.from_time && !d.to_time) {
+			// Match the specific row this session started, not just "any row
+			// without a to_time" — that's what let an orphaned row get closed
+			// and counted alongside the real one.
+			if (
+				d.from_time &&
+				!d.to_time &&
+				d.from_time === frm.doc.started_time
+			) {
 				d.to_time = completed_time || frappe.datetime.now_datetime();
 				d.completed_qty = completed_qty || 0;
 
@@ -190,15 +197,16 @@ frappe.ui.form.on('Job Card LGM', {
 		}
 	},
 
-	employee: function (frm) {
-		if (frm.doc.job_started && !frm.doc.current_time) {
-			frm.trigger('reset_timer');
-		} else {
-			frm.events.start_job(frm);
-		}
-	},
-
 	reset_timer: function (frm) {
+		// Defensive cleanup: if a dangling open row exists when we reset the
+		// flags, remove it instead of silently orphaning it in time_logs.
+		(frm.doc.time_logs || []).forEach((d) => {
+			if (d.from_time && !d.to_time) {
+				frappe.model.clear_doc(d.doctype, d.name);
+			}
+		});
+		frm.refresh_field('time_logs');
+
 		frm.set_value('started_time', '');
 		frm.set_value('job_started', 0);
 		frm.set_value('current_time', 0);
