@@ -76,8 +76,8 @@ class JobCardLGM(Document):
 			if self.get('ingredient_type') == d.get('ingredient_type'):
 				self.append('ingredients', {
 					'ingredient': d.ingredient,
-					'required_weight': d.weighed,
-					'mixer_no': d.mixer_no
+					'required_weight': d.actual_weight,
+					'mix_no': d.mix_no
 				})
 
 	def validate_job_card(self):
@@ -127,11 +127,12 @@ class JobCardLGM(Document):
 		self.create_material_issue_on_submit()
 
 	def create_material_issue_on_submit(self):
-		# Prevent duplicate creation if a submitted Stock Entry already exists for this Work Order
+		# Prevent duplicate creation if a submitted Stock Entry already exists for THIS Job Card
 		existing_entry = frappe.db.get_value(
 			"Stock Entry",
 			{
 				"work_order_lgm": self.work_order,
+				"job_card_lgm": self.name, # Now checks at the Job Card level
 				"stock_entry_type": "Material Issue",
 				"docstatus": 1
 			},
@@ -145,34 +146,35 @@ class JobCardLGM(Document):
 		weights = {}
 
 		for row in ingredient_list:
-			if row.weighed:
+			if row.actual_weight:
 				ingredient_name = row.ingredient
-				weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row.weighed)
+				weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row.actual_weight)
 
 		if not weights:
 			return
 
-		# 2. Re-verify stock server-side before processing
 		shortfalls = _get_stock_shortfalls(weights)
 		if shortfalls:
 			frappe.throw(_("Cannot submit: Insufficient stock for one or more ingredients in WIP warehouse."))
 
 		stock_entry_details = []
-		for ingredient_name, ingredient_weight in weights.items():
+		for ingredient_name, requested_weight in weights.items():
 			stock_entry_details.append(dict(
 				s_warehouse=wip,
 				item_code=ingredient_name,
-				qty=ingredient_weight
+				qty=requested_weight
 			))
 
-		# 3. Create and submit within the document commit transaction
+		# Include job_card_lgm when inserting the new Stock Entry
 		stock_entry = frappe.get_doc(dict(
 			doctype="Stock Entry",
 			stock_entry_type="Material Issue",
 			work_order_lgm=self.work_order,
+			job_card_lgm=self.name, # Link the Stock Entry back to this Job Card
 			from_warehouse=wip,
 			items=stock_entry_details,
 		)).insert()
+
 		stock_entry.submit()
 
 # Whitelisted function called by JS client-side purely for stock checking
@@ -183,9 +185,9 @@ def check_stock_availability(doc):
     weights = {}
 
     for row in ingredient_list:
-        if row.get("weighed"):
+        if row.get("actual_weight"):
             ingredient_name = row.get("ingredient")
-            weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row["weighed"])
+            weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row["actual_weight"])
 
     if not weights:
         return True
@@ -254,10 +256,10 @@ def create_material_issue(doc):
 	# override, if the human picked a fallback for this ingredient, wins over
 	# the row's own source_warehouse
 	for row in ingredient_list:
-		if row.get("weighed"):
+		if row.get("actual_weight"):
 			ingredient_name = row.get("ingredient")
 			key = ingredient_name
-			weights[key] = weights.get(key, 0) + float(row["weighed"])
+			weights[key] = weights.get(key, 0) + float(row["actual_weight"])
 
 	if not weights:
 		return True
@@ -276,11 +278,11 @@ def create_material_issue(doc):
 	# put each (ingredient, source_warehouse) pair and its total weight into
 	# the stock entry's item rows
 	stock_entry_details = []
-	for ingredient_name, ingredient_weight in weights.items():
+	for ingredient_name, requested_weight in weights.items():
 		stock_entry_details.append(dict(
 			s_warehouse = wip,
 			item_code = ingredient_name,
-			qty = ingredient_weight
+			qty = requested_weight
 		))
 
 	# insert stock entry record here — no single header-level from_warehouse

@@ -325,7 +325,7 @@ frappe.ui.form.on('Job Card LGM', {
 		var ingredients_list = frm.doc['ingredients'] || [];
 		var no_of_ingredients = ingredients_list.length;
 		for (var i = 0; i < no_of_ingredients; i++) {
-			if (ingredients_list[i]['weighed'] == undefined) {
+			if (ingredients_list[i]['actual_weight'] == undefined) {
 				frm.reload_doc();
 				frappe.throw({
 					message: __(`Ingredient ${i + 1} weight is not measured yet.`),

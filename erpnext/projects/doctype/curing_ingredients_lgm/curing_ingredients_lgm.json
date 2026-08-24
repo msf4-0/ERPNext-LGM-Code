@@ -5,39 +5,39 @@
  "engine": "InnoDB",
  "field_order": [
   "ingredient",
-  "select_mixer_no",
+  "select_mix_no",
   "section_break",
-  "mixer_1",
-  "mixer_2",
-  "mixer_3",
-  "mixer_4",
-  "mixer_5",
-  "mixer_6",
-  "mixer_7",
-  "mixer_8",
-  "mixer_9",
-  "mixer_10",
-  "mixer_11",
-  "mixer_12",
-  "mixer_13",
-  "mixer_14",
-  "mixer_15",
-  "col_break_mixer",
-  "formulation_mixer_1",
-  "formulation_mixer_2",
-  "formulation_mixer_3",
-  "formulation_mixer_4",
-  "formulation_mixer_5",
-  "formulation_mixer_6",
-  "formulation_mixer_7",
-  "formulation_mixer_8",
-  "formulation_mixer_9",
-  "formulation_mixer_10",
-  "formulation_mixer_11",
-  "formulation_mixer_12",
-  "formulation_mixer_13",
-  "formulation_mixer_14",
-  "formulation_mixer_15"
+  "mix_1",
+  "mix_2",
+  "mix_3",
+  "mix_4",
+  "mix_5",
+  "mix_6",
+  "mix_7",
+  "mix_8",
+  "mix_9",
+  "mix_10",
+  "mix_11",
+  "mix_12",
+  "mix_13",
+  "mix_14",
+  "mix_15",
+  "col_break_mix",
+  "formulation_mix_1",
+  "formulation_mix_2",
+  "formulation_mix_3",
+  "formulation_mix_4",
+  "formulation_mix_5",
+  "formulation_mix_6",
+  "formulation_mix_7",
+  "formulation_mix_8",
+  "formulation_mix_9",
+  "formulation_mix_10",
+  "formulation_mix_11",
+  "formulation_mix_12",
+  "formulation_mix_13",
+  "formulation_mix_14",
+  "formulation_mix_15"
  ],
  "fields": [
   {
@@ -53,194 +53,194 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "mixer_1",
+   "fieldname": "mix_1",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Ingredient Weight Mixer 1"
+   "label": "Ingredient Weight Mix 1"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=2;",
-   "fieldname": "mixer_2",
+   "depends_on": "eval:doc.select_mix_no>=2;",
+   "fieldname": "mix_2",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 2"
+   "label": "Ingredient Weight Mix 2"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=3;",
-   "fieldname": "mixer_3",
+   "depends_on": "eval:doc.select_mix_no>=3;",
+   "fieldname": "mix_3",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 3"
+   "label": "Ingredient Weight Mix 3"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=4;",
-   "fieldname": "mixer_4",
+   "depends_on": "eval:doc.select_mix_no>=4;",
+   "fieldname": "mix_4",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 4"
+   "label": "Ingredient Weight Mix 4"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=5;",
-   "fieldname": "mixer_5",
+   "depends_on": "eval:doc.select_mix_no>=5;",
+   "fieldname": "mix_5",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 5"
+   "label": "Ingredient Weight Mix 5"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=6;",
-   "fieldname": "mixer_6",
+   "depends_on": "eval:doc.select_mix_no>=6;",
+   "fieldname": "mix_6",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 6"
+   "label": "Ingredient Weight Mix 6"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=7;",
-   "fieldname": "mixer_7",
+   "depends_on": "eval:doc.select_mix_no>=7;",
+   "fieldname": "mix_7",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 7"
+   "label": "Ingredient Weight Mix 7"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=8;",
-   "fieldname": "mixer_8",
+   "depends_on": "eval:doc.select_mix_no>=8;",
+   "fieldname": "mix_8",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 8"
+   "label": "Ingredient Weight Mix 8"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=9;",
-   "fieldname": "mixer_9",
+   "depends_on": "eval:doc.select_mix_no>=9;",
+   "fieldname": "mix_9",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 9"
+   "label": "Ingredient Weight Mix 9"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=10;",
-   "fieldname": "mixer_10",
+   "depends_on": "eval:doc.select_mix_no>=10;",
+   "fieldname": "mix_10",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 10"
+   "label": "Ingredient Weight Mix 10"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=11;",
-   "fieldname": "mixer_11",
+   "depends_on": "eval:doc.select_mix_no>=11;",
+   "fieldname": "mix_11",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 11"
+   "label": "Ingredient Weight Mix 11"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=12;",
-   "fieldname": "mixer_12",
+   "depends_on": "eval:doc.select_mix_no>=12;",
+   "fieldname": "mix_12",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 12"
+   "label": "Ingredient Weight Mix 12"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=13;",
-   "fieldname": "mixer_13",
+   "depends_on": "eval:doc.select_mix_no>=13;",
+   "fieldname": "mix_13",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 13"
+   "label": "Ingredient Weight Mix 13"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=14;",
-   "fieldname": "mixer_14",
+   "depends_on": "eval:doc.select_mix_no>=14;",
+   "fieldname": "mix_14",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 14"
+   "label": "Ingredient Weight Mix 14"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=15;",
-   "fieldname": "mixer_15",
+   "depends_on": "eval:doc.select_mix_no>=15;",
+   "fieldname": "mix_15",
    "fieldtype": "Data",
-   "label": "Ingredient Weight Mixer 15"
+   "label": "Ingredient Weight Mix 15"
   },
   {
-   "fieldname": "col_break_mixer",
+   "fieldname": "col_break_mix",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "formulation_mixer_1",
+   "fieldname": "formulation_mix_1",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Formulation Parts per Hundred Mixer 1"
+   "label": "Formulation Parts per Hundred Mix 1"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=2;",
-   "fieldname": "formulation_mixer_2",
+   "depends_on": "eval:doc.select_mix_no>=2;",
+   "fieldname": "formulation_mix_2",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 2"
+   "label": "Formulation Parts per Hundred Mix 2"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=3;",
-   "fieldname": "formulation_mixer_3",
+   "depends_on": "eval:doc.select_mix_no>=3;",
+   "fieldname": "formulation_mix_3",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 3"
+   "label": "Formulation Parts per Hundred Mix 3"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=4;",
-   "fieldname": "formulation_mixer_4",
+   "depends_on": "eval:doc.select_mix_no>=4;",
+   "fieldname": "formulation_mix_4",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 4"
+   "label": "Formulation Parts per Hundred Mix 4"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=5;",
-   "fieldname": "formulation_mixer_5",
+   "depends_on": "eval:doc.select_mix_no>=5;",
+   "fieldname": "formulation_mix_5",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 5"
+   "label": "Formulation Parts per Hundred Mix 5"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=6;",
-   "fieldname": "formulation_mixer_6",
+   "depends_on": "eval:doc.select_mix_no>=6;",
+   "fieldname": "formulation_mix_6",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 6"
+   "label": "Formulation Parts per Hundred Mix 6"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=7;",
-   "fieldname": "formulation_mixer_7",
+   "depends_on": "eval:doc.select_mix_no>=7;",
+   "fieldname": "formulation_mix_7",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 7"
+   "label": "Formulation Parts per Hundred Mix 7"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=8;",
-   "fieldname": "formulation_mixer_8",
+   "depends_on": "eval:doc.select_mix_no>=8;",
+   "fieldname": "formulation_mix_8",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 8"
+   "label": "Formulation Parts per Hundred Mix 8"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=9;",
-   "fieldname": "formulation_mixer_9",
+   "depends_on": "eval:doc.select_mix_no>=9;",
+   "fieldname": "formulation_mix_9",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 9"
+   "label": "Formulation Parts per Hundred Mix 9"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=10;",
-   "fieldname": "formulation_mixer_10",
+   "depends_on": "eval:doc.select_mix_no>=10;",
+   "fieldname": "formulation_mix_10",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 10"
+   "label": "Formulation Parts per Hundred Mix 10"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=11;",
-   "fieldname": "formulation_mixer_11",
+   "depends_on": "eval:doc.select_mix_no>=11;",
+   "fieldname": "formulation_mix_11",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 11"
+   "label": "Formulation Parts per Hundred Mix 11"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=12;",
-   "fieldname": "formulation_mixer_12",
+   "depends_on": "eval:doc.select_mix_no>=12;",
+   "fieldname": "formulation_mix_12",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 12"
+   "label": "Formulation Parts per Hundred Mix 12"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=13;",
-   "fieldname": "formulation_mixer_13",
+   "depends_on": "eval:doc.select_mix_no>=13;",
+   "fieldname": "formulation_mix_13",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 13"
+   "label": "Formulation Parts per Hundred Mix 13"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=14;",
-   "fieldname": "formulation_mixer_14",
+   "depends_on": "eval:doc.select_mix_no>=14;",
+   "fieldname": "formulation_mix_14",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 14"
+   "label": "Formulation Parts per Hundred Mix 14"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=15;",
-   "fieldname": "formulation_mixer_15",
+   "depends_on": "eval:doc.select_mix_no>=15;",
+   "fieldname": "formulation_mix_15",
    "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 15"
+   "label": "Formulation Parts per Hundred Mix 15"
   },
   {
    "default": "1",
-   "fieldname": "select_mixer_no",
+   "fieldname": "select_mix_no",
    "fieldtype": "Select",
-   "label": "Number of Mixer",
+   "label": "Number of Mix",
    "options": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15"
   }
  ],

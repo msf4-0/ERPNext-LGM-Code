@@ -88,15 +88,15 @@ class TestWorkOrderLGM(unittest.TestCase):
         
         return doc
 
-    def create_mock_ingredient(self, ingredient_type="Compounding", ingredient_name="Rubber", weight=50.0, mixer_no=1):
+    def create_mock_ingredient(self, ingredient_type="Compounding", ingredient_name="Rubber", weight=50.0, mix_no=1):
         """Helper to structure ingredient rows for the payload while ensuring the Item exists."""
         self.ensure_item(ingredient_name)
         
         return {
             "ingredient_type": ingredient_type,
             "ingredient": ingredient_name,
-            "weighed": weight,
-            "mixer_no": mixer_no
+            "actual_weight": weight,
+            "mix_no": mix_no
         }
 
     # -------------------------------------------------------------------------
@@ -225,7 +225,7 @@ class TestWorkOrderLGM(unittest.TestCase):
         req_sheet = self.make_request_sheet()
         work_order = self.make_work_order(req_sheet.name, [self.create_mock_ingredient("Compounding", "Rubber", 50, 1)])
         
-        # Simulate payload exactly as JS `job_card_lgm.js` sends it (missing mixer_no_job_card)
+        # Simulate payload exactly as JS `job_card_lgm.js` sends it (missing mix_no_job_card)
         mock_frontend_payload = json.dumps({
             "doctype": "Job Card LGM",
             "work_order": work_order.name,

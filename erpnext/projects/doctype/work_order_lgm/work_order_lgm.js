@@ -20,14 +20,14 @@ frappe.ui.form.on('Work Order LGM', {
 	},
 
 	onload: function (frm) {
-		var df_weighed = frappe.meta.get_docfield(
+		var df_actual_weight = frappe.meta.get_docfield(
 			'Ingredients Weighing Table LGM',
-			'weighed',
+			'actual_weight',
 			frm.doc.name,
 		);
-		if (df_weighed) {
-			df_weighed.hidden = 1;
-			df_weighed.read_only = 1;
+		if (df_actual_weight) {
+			df_actual_weight.hidden = 1;
+			df_actual_weight.read_only = 1;
 		}
 		frm.refresh_field('weighing_table_lgm');
 
