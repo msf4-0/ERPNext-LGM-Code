@@ -159,7 +159,14 @@ frappe.ui.form.on('Job Card LGM', {
 
 	complete_job: function (frm, completed_time, completed_qty) {
 		frm.doc.time_logs.forEach((d) => {
-			if (d.from_time && !d.to_time) {
+			// Match the specific row this session started, not just "any row
+			// without a to_time" — that's what let an orphaned row get closed
+			// and counted alongside the real one.
+			if (
+				d.from_time &&
+				!d.to_time &&
+				d.from_time === frm.doc.started_time
+			) {
 				d.to_time = completed_time || frappe.datetime.now_datetime();
 				d.completed_qty = completed_qty || 0;
 
