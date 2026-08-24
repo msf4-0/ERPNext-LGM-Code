@@ -51,13 +51,13 @@ class JobCardLGM(Document):
 			and jctl.name!=%(name)s
 			and jc.name!=%(parent)s
 			and jc.docstatus < 2
-			and jc.employee = %(employee)s """,
+			and jctl.employee = %(employee)s """,   # jctl, not jc
 			{
 				"from_time": args.from_time,
 				"to_time": args.to_time,
 				"name": args.name or "No Name",
 				"parent": args.parent or "No Name",
-				"employee": self.employee
+				"employee": args.employee            # the row's own employee, not self.employee
 			}, as_dict=True)
 
 		return existing[0] if existing else None

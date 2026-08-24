@@ -86,9 +86,8 @@ frappe.ui.form.on('Job Card LGM', {
 						(d) => {
 							if (d.employee) {
 								frm.set_value('employee', d.employee);
-							} else {
-								frm.events.start_job(frm);
 							}
+							frm.events.start_job(frm);
 						},
 						__('Enter Value'),
 						__('Start'),
@@ -142,6 +141,7 @@ frappe.ui.form.on('Job Card LGM', {
 			'time_logs',
 		);
 		row.from_time = frappe.datetime.now_datetime();
+		row.employee = frm.doc.employee;
 		frm.set_value('job_started', 1);
 		frm.set_value('started_time', row.from_time);
 		frm.set_value('status', 'Work In Progress');
@@ -187,14 +187,6 @@ frappe.ui.form.on('Job Card LGM', {
 			frm.doc.started_time
 		) {
 			frm.trigger('reset_timer');
-		}
-	},
-
-	employee: function (frm) {
-		if (frm.doc.job_started && !frm.doc.current_time) {
-			frm.trigger('reset_timer');
-		} else {
-			frm.events.start_job(frm);
 		}
 	},
 
