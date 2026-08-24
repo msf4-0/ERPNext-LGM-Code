@@ -342,7 +342,6 @@ frappe.ui.form.on('Job Card LGM', {
 			}
 		}
 
-		// The outer Promise safely pauses the save/submit event
 		return new Promise((resolve, reject) => {
 			const cancel_submission = () => {
 				if (frm.page && frm.page.btn_primary) {
@@ -353,18 +352,19 @@ frappe.ui.form.on('Job Card LGM', {
 				reject('cancel');
 			};
 
+			// CALL READ-ONLY STOCK CHECK INSTEAD OF CREATING STOCK ENTRY HERE
 			frm.call({
-				method: 'create_material_issue',
+				method: 'check_stock_availability',
 				args: { doc: frm.doc },
 				callback: (r) => {
 					var response = r.message;
 
-					// Success path
+					// Stock is sufficient -> Proceed with document submission
 					if (response === true) {
 						return resolve();
 					}
 
-					// Handle Shortfalls
+					// Handle Shortfalls dialog
 					var shortfall_html = response
 						.map(
 							(s) =>
@@ -416,7 +416,6 @@ frappe.ui.form.on('Job Card LGM', {
 					dialog.show();
 				},
 				error: (r) => {
-					// Safely unlock the UI if the backend throws a 500 or times out
 					cancel_submission();
 				},
 			});
