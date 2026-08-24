@@ -14,28 +14,30 @@ class TechnologicalRequestSheetsLGM(Document):
 def create_item_from_reference_no(doc):
 	STARTING_NO = 1
 	ITEM_GROUP_NAME = "Products"
-	SEPARATOR = '/'
+	UNIT_OF_MEASURE = "Nos"
+	QUANTITY = 1
+	COPY_NO_SEPARATOR = '/'
 
 	item_code = doc.reference_no
 	no_of_mixes = _get_num_of_mixes(doc)
 	item_copies = []
 
-	if frappe.db.exists("Item", item_code + SEPARATOR + str(STARTING_NO)):
+	if frappe.db.exists("Item", item_code + COPY_NO_SEPARATOR + str(STARTING_NO)):
 		return
 
 	_ensure_item_group_exists(ITEM_GROUP_NAME)
 
 	for i in range (no_of_mixes):
 		curr_no = STARTING_NO + i
-		item_copy_code = item_code + SEPARATOR + str(curr_no)
+		item_copy_code = item_code + COPY_NO_SEPARATOR + str(curr_no)
 
 		item = frappe.get_doc({
 			"doctype": "Item",
 			"item_code": item_copy_code,
 			"item_name": item_copy_code,
 			"item_group": ITEM_GROUP_NAME,
-			"stock_uom": "Gram",
-			"is_stock_item": 1,
+			"stock_uom": UNIT_OF_MEASURE,
+			"is_stock_item": QUANTITY,
 		})
 		item_copies.append(item)
 
