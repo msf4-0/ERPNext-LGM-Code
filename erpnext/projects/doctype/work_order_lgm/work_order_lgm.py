@@ -14,6 +14,12 @@ class WorkOrderLGM(Document):
 
 	def on_cancel(self):
 		reclaim_unused_job_card_materials(self.name)
+		frappe.db.set_value("Work Order LGM", self.name, "status", "Cancelled")
+
+		frappe.publish_realtime(
+            event="work_order_lgm_status_changed",
+            message={"work_order": self.name, "status": "Cancelled"}
+		)
 
 def reclaim_unused_job_card_materials(work_order_name):
 	UNSUBMITTED_STATUS_ENUM = 0
@@ -320,11 +326,14 @@ def update_status(work_order_name):
 	- Completed <- Every non-cancelled job card is completed
 	- In progress <- Everything else
 	"""
-	CANCELLED_STATUS_NUM = 2
+	DOCTYPE_CANCELLED_STATUS_NUM = 2
+
+	if frappe.db.get_value("Work Order LGM", work_order_name, "docstatus") == DOCTYPE_CANCELLED_STATUS_NUM:
+		return
 
 	job_cards = frappe.get_all(
 		"Job Card LGM",
-		filters = {"work_order": work_order_name, "docstatus": ["!=", CANCELLED_STATUS_NUM]},
+		filters = {"work_order": work_order_name, "docstatus": ["!=", DOCTYPE_CANCELLED_STATUS_NUM]},
 		fields = ["status"]
 	)
 

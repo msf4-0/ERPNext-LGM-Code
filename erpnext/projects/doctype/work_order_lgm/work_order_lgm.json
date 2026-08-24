@@ -57,7 +57,7 @@
    "in_standard_filter": 1,
    "label": "Status",
    "no_copy": 1,
-   "options": "Not Started\nIn Progress\nCompleted",
+   "options": "Not Started\nIn Progress\nCompleted\nCancelled",
    "read_only": 1
   }
  ],

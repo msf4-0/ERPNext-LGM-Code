@@ -44,6 +44,7 @@ frappe.ui.form.on('Work Order LGM', {
 				'Not Started': 'orange',
 				'In Progress': 'blue',
 				'Completed': 'green',
+				'Cancelled': 'red',
 			};
 			frm.page.set_indicator(
 				__(frm.doc.status),
