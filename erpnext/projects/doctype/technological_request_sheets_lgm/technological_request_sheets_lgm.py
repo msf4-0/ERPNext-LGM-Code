@@ -57,7 +57,7 @@ def _get_num_of_mixes(doc):
 
 	for ingredient_type, type_list in type_list_pairs:
 		for list_object in type_list:
-			mix_no = int(list_object.get("select_mixer_no", 0))
+			mix_no = int(list_object.get("select_mix_no", 0))
 
 			max_mix_no = max(mix_no, max_mix_no)
 
@@ -88,13 +88,13 @@ def calculate_waste(doc):
 	mb = doc["compounding_ingredients"][len(doc["compounding_ingredients"]) -1]
 	curing = doc["curing_ingredients"][0]
 
-	mb_mixer_count = int(mb["select_mixer_no"])
+	mb_mix_count = int(mb["select_mix_no"])
 	mb_waste = 0
 
-	for i in range(1, mb_mixer_count+1):
-		waste_name = "mixer_" + str(i)
-		mixer_name = "mixer_" + str(i)
-		mb_waste += float(mb[waste_name]) - float(curing[mixer_name])
+	for i in range(1, mb_mix_count+1):
+		waste_name = "mix_" + str(i)
+		mix_name = "mix_" + str(i)
+		mb_waste += float(mb[waste_name]) - float(curing[mix_name])
 
 	mb_waste = round(mb_waste, 2)
 	return mb_waste
@@ -117,19 +117,19 @@ def create_work_order_lgm(doc):
 
 	for ingredient_type, type_list in type_list_pairs:
 		for list_object in type_list:
-			mixer_no = int(list_object.get("select_mixer_no", 0))
+			mix_no = int(list_object.get("select_mix_no", 0))
 			ingredient_name = list_object.get("ingredient")
 
 			if ingredient_name != "Masterbatch":
-				for i in range(1, mixer_no + 1):
-					# Fetch weight dynamically based on mixer number
-					weight = list_object.get(f"mixer_{i}")
+				for i in range(1, mix_no + 1):
+					# Fetch weight dynamically based on mix number
+					weight = list_object.get(f"mix_{i}")
 					if weight is not None:
 						ingredient_list.append({
 							"ingredient_type": ingredient_type,
 							"ingredient": ingredient_name,
 							"ingredient_weight": weight,
-							"mixer_no": i
+							"mix_no": i
 						})
 
 	# Generate and insert the Work Order document

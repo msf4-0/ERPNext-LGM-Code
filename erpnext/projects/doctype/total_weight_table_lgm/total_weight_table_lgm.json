@@ -4,94 +4,94 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "select_mixer_no",
+  "select_mix_no",
   "section_break",
-  "formulation_mixer_1",
-  "formulation_mixer_2",
-  "formulation_mixer_3",
-  "formulation_mixer_4",
-  "formulation_mixer_5",
-  "formulation_mixer_6",
-  "formulation_mixer_7",
-  "formulation_mixer_8",
-  "formulation_mixer_9",
-  "formulation_mixer_10",
-  "formulation_mixer_11",
-  "formulation_mixer_12",
-  "formulation_mixer_13",
-  "formulation_mixer_14",
-  "formulation_mixer_15",
+  "formulation_mix_1",
+  "formulation_mix_2",
+  "formulation_mix_3",
+  "formulation_mix_4",
+  "formulation_mix_5",
+  "formulation_mix_6",
+  "formulation_mix_7",
+  "formulation_mix_8",
+  "formulation_mix_9",
+  "formulation_mix_10",
+  "formulation_mix_11",
+  "formulation_mix_12",
+  "formulation_mix_13",
+  "formulation_mix_14",
+  "formulation_mix_15",
   "col_break_1",
-  "composition_weight_mixer_1",
-  "composition_weight_mixer_2",
-  "composition_weight_mixer_3",
-  "composition_weight_mixer_4",
-  "composition_weight_mixer_5",
-  "composition_weight_mixer_6",
-  "composition_weight_mixer_7",
-  "composition_weight_mixer_8",
-  "composition_weight_mixer_9",
-  "composition_weight_mixer_10",
-  "composition_weight_mixer_11",
-  "composition_weight_mixer_12",
-  "composition_weight_mixer_13",
-  "composition_weight_mixer_14",
-  "composition_weight_mixer_15",
+  "composition_weight_mix_1",
+  "composition_weight_mix_2",
+  "composition_weight_mix_3",
+  "composition_weight_mix_4",
+  "composition_weight_mix_5",
+  "composition_weight_mix_6",
+  "composition_weight_mix_7",
+  "composition_weight_mix_8",
+  "composition_weight_mix_9",
+  "composition_weight_mix_10",
+  "composition_weight_mix_11",
+  "composition_weight_mix_12",
+  "composition_weight_mix_13",
+  "composition_weight_mix_14",
+  "composition_weight_mix_15",
   "col_break_2",
-  "masterbatch_mult_factor_mixer_1",
-  "masterbatch_mult_factor_mixer_2",
-  "masterbatch_mult_factor_mixer_3",
-  "masterbatch_mult_factor_mixer_4",
-  "masterbatch_mult_factor_mixer_5",
-  "masterbatch_mult_factor_mixer_6",
-  "masterbatch_mult_factor_mixer_7",
-  "masterbatch_mult_factor_mixer_8",
-  "masterbatch_mult_factor_mixer_9",
-  "masterbatch_mult_factor_mixer_10",
-  "masterbatch_mult_factor_mixer_11",
-  "masterbatch_mult_factor_mixer_12",
-  "masterbatch_mult_factor_mixer_13",
-  "masterbatch_mult_factor_mixer_14",
-  "masterbatch_mult_factor_mixer_15",
+  "masterbatch_mult_factor_mix_1",
+  "masterbatch_mult_factor_mix_2",
+  "masterbatch_mult_factor_mix_3",
+  "masterbatch_mult_factor_mix_4",
+  "masterbatch_mult_factor_mix_5",
+  "masterbatch_mult_factor_mix_6",
+  "masterbatch_mult_factor_mix_7",
+  "masterbatch_mult_factor_mix_8",
+  "masterbatch_mult_factor_mix_9",
+  "masterbatch_mult_factor_mix_10",
+  "masterbatch_mult_factor_mix_11",
+  "masterbatch_mult_factor_mix_12",
+  "masterbatch_mult_factor_mix_13",
+  "masterbatch_mult_factor_mix_14",
+  "masterbatch_mult_factor_mix_15",
   "col_break_3",
-  "composition_mult_factor_mixer_1",
-  "composition_mult_factor_mixer_2",
-  "composition_mult_factor_mixer_3",
-  "composition_mult_factor_mixer_4",
-  "composition_mult_factor_mixer_5",
-  "composition_mult_factor_mixer_6",
-  "composition_mult_factor_mixer_7",
-  "composition_mult_factor_mixer_8",
-  "composition_mult_factor_mixer_9",
-  "composition_mult_factor_mixer_10",
-  "composition_mult_factor_mixer_11",
-  "composition_mult_factor_mixer_12",
-  "composition_mult_factor_mixer_13",
-  "composition_mult_factor_mixer_14",
-  "composition_mult_factor_mixer_15",
+  "composition_mult_factor_mix_1",
+  "composition_mult_factor_mix_2",
+  "composition_mult_factor_mix_3",
+  "composition_mult_factor_mix_4",
+  "composition_mult_factor_mix_5",
+  "composition_mult_factor_mix_6",
+  "composition_mult_factor_mix_7",
+  "composition_mult_factor_mix_8",
+  "composition_mult_factor_mix_9",
+  "composition_mult_factor_mix_10",
+  "composition_mult_factor_mix_11",
+  "composition_mult_factor_mix_12",
+  "composition_mult_factor_mix_13",
+  "composition_mult_factor_mix_14",
+  "composition_mult_factor_mix_15",
   "col_break_4",
-  "density_masterbatch_mixer_1",
-  "density_masterbatch_mixer_2",
-  "density_masterbatch_mixer_3",
-  "density_masterbatch_mixer_4",
-  "density_masterbatch_mixer_5",
-  "density_masterbatch_mixer_6",
-  "density_masterbatch_mixer_7",
-  "density_masterbatch_mixer_8",
-  "density_masterbatch_mixer_9",
-  "density_masterbatch_mixer_10",
-  "density_masterbatch_mixer_11",
-  "density_masterbatch_mixer_12",
-  "density_masterbatch_mixer_13",
-  "density_masterbatch_mixer_14",
-  "density_masterbatch_mixer_15"
+  "density_masterbatch_mix_1",
+  "density_masterbatch_mix_2",
+  "density_masterbatch_mix_3",
+  "density_masterbatch_mix_4",
+  "density_masterbatch_mix_5",
+  "density_masterbatch_mix_6",
+  "density_masterbatch_mix_7",
+  "density_masterbatch_mix_8",
+  "density_masterbatch_mix_9",
+  "density_masterbatch_mix_10",
+  "density_masterbatch_mix_11",
+  "density_masterbatch_mix_12",
+  "density_masterbatch_mix_13",
+  "density_masterbatch_mix_14",
+  "density_masterbatch_mix_15"
  ],
  "fields": [
   {
    "default": "1",
-   "fieldname": "select_mixer_no",
+   "fieldname": "select_mix_no",
    "fieldtype": "Select",
-   "label": "Number of Mixer",
+   "label": "Number of Mix",
    "options": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15"
   },
   {
@@ -99,10 +99,10 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "composition_weight_mixer_1",
-   "fieldtype": "Data",
+   "fieldname": "composition_weight_mix_1",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Comp. Weight Mixer 1 (gm)",
+   "label": "Comp. Weight Mix 1 (gm)",
    "reqd": 1
   },
   {
@@ -110,10 +110,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "masterbatch_mult_factor_mixer_1",
-   "fieldtype": "Data",
+   "fieldname": "masterbatch_mult_factor_mix_1",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "MB Multp. Factor Mixer 1",
+   "label": "MB Multp. Factor Mix 1",
    "reqd": 1
   },
   {
@@ -121,10 +121,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "composition_mult_factor_mixer_1",
-   "fieldtype": "Data",
+   "fieldname": "composition_mult_factor_mix_1",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Comp. Multp. Factor Mixer 1",
+   "label": "Comp. Multp. Factor Mix 1",
    "reqd": 1
   },
   {
@@ -132,438 +132,438 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "density_masterbatch_mixer_1",
-   "fieldtype": "Data",
+   "fieldname": "density_masterbatch_mix_1",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Density MB Mixer 1",
+   "label": "Density MB Mix 1",
    "reqd": 1
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=2;",
-   "fieldname": "composition_weight_mixer_2",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 2 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=2;",
+   "fieldname": "composition_weight_mix_2",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 2 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=3;",
-   "fieldname": "composition_weight_mixer_3",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 3 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=3;",
+   "fieldname": "composition_weight_mix_3",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 3 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=4;",
-   "fieldname": "composition_weight_mixer_4",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 4 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=4;",
+   "fieldname": "composition_weight_mix_4",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 4 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=5;",
-   "fieldname": "composition_weight_mixer_5",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 5 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=5;",
+   "fieldname": "composition_weight_mix_5",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 5 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=6;",
-   "fieldname": "composition_weight_mixer_6",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 6 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=6;",
+   "fieldname": "composition_weight_mix_6",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 6 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=7;",
-   "fieldname": "composition_weight_mixer_7",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 7 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=7;",
+   "fieldname": "composition_weight_mix_7",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 7 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=8;",
-   "fieldname": "composition_weight_mixer_8",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 8 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=8;",
+   "fieldname": "composition_weight_mix_8",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 8 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=9;",
-   "fieldname": "composition_weight_mixer_9",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 9 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=9;",
+   "fieldname": "composition_weight_mix_9",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 9 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=10;",
-   "fieldname": "composition_weight_mixer_10",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 10 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=10;",
+   "fieldname": "composition_weight_mix_10",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 10 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=11;",
-   "fieldname": "composition_weight_mixer_11",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 11 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=11;",
+   "fieldname": "composition_weight_mix_11",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 11 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=12;",
-   "fieldname": "composition_weight_mixer_12",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 12 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=12;",
+   "fieldname": "composition_weight_mix_12",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 12 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=13;",
-   "fieldname": "composition_weight_mixer_13",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 13 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=13;",
+   "fieldname": "composition_weight_mix_13",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 13 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=14;",
-   "fieldname": "composition_weight_mixer_14",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 14 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=14;",
+   "fieldname": "composition_weight_mix_14",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 14 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=15;",
-   "fieldname": "composition_weight_mixer_15",
-   "fieldtype": "Data",
-   "label": "Comp. Weight Mixer 15 (gm)"
+   "depends_on": "eval:doc.select_mix_no>=15;",
+   "fieldname": "composition_weight_mix_15",
+   "fieldtype": "Float",
+   "label": "Comp. Weight Mix 15 (gm)"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=2;",
-   "fieldname": "masterbatch_mult_factor_mixer_2",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 2"
+   "depends_on": "eval:doc.select_mix_no>=2;",
+   "fieldname": "masterbatch_mult_factor_mix_2",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 2"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=3;",
-   "fieldname": "masterbatch_mult_factor_mixer_3",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 3"
+   "depends_on": "eval:doc.select_mix_no>=3;",
+   "fieldname": "masterbatch_mult_factor_mix_3",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 3"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=4;",
-   "fieldname": "masterbatch_mult_factor_mixer_4",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 4"
+   "depends_on": "eval:doc.select_mix_no>=4;",
+   "fieldname": "masterbatch_mult_factor_mix_4",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 4"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=5;",
-   "fieldname": "masterbatch_mult_factor_mixer_5",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 5"
+   "depends_on": "eval:doc.select_mix_no>=5;",
+   "fieldname": "masterbatch_mult_factor_mix_5",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 5"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=6;",
-   "fieldname": "masterbatch_mult_factor_mixer_6",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 6"
+   "depends_on": "eval:doc.select_mix_no>=6;",
+   "fieldname": "masterbatch_mult_factor_mix_6",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 6"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=7;",
-   "fieldname": "masterbatch_mult_factor_mixer_7",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 7"
+   "depends_on": "eval:doc.select_mix_no>=7;",
+   "fieldname": "masterbatch_mult_factor_mix_7",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 7"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=8;",
-   "fieldname": "masterbatch_mult_factor_mixer_8",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 8"
+   "depends_on": "eval:doc.select_mix_no>=8;",
+   "fieldname": "masterbatch_mult_factor_mix_8",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 8"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=9;",
-   "fieldname": "masterbatch_mult_factor_mixer_9",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 9"
+   "depends_on": "eval:doc.select_mix_no>=9;",
+   "fieldname": "masterbatch_mult_factor_mix_9",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 9"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=10;",
-   "fieldname": "masterbatch_mult_factor_mixer_10",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 10"
+   "depends_on": "eval:doc.select_mix_no>=10;",
+   "fieldname": "masterbatch_mult_factor_mix_10",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 10"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=11;",
-   "fieldname": "masterbatch_mult_factor_mixer_11",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 11"
+   "depends_on": "eval:doc.select_mix_no>=11;",
+   "fieldname": "masterbatch_mult_factor_mix_11",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 11"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=12;",
-   "fieldname": "masterbatch_mult_factor_mixer_12",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 12"
+   "depends_on": "eval:doc.select_mix_no>=12;",
+   "fieldname": "masterbatch_mult_factor_mix_12",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 12"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=13;",
-   "fieldname": "masterbatch_mult_factor_mixer_13",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 13"
+   "depends_on": "eval:doc.select_mix_no>=13;",
+   "fieldname": "masterbatch_mult_factor_mix_13",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 13"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=14;",
-   "fieldname": "masterbatch_mult_factor_mixer_14",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 14"
+   "depends_on": "eval:doc.select_mix_no>=14;",
+   "fieldname": "masterbatch_mult_factor_mix_14",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 14"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=15;",
-   "fieldname": "masterbatch_mult_factor_mixer_15",
-   "fieldtype": "Data",
-   "label": "MB Multp. Factor Mixer 15"
+   "depends_on": "eval:doc.select_mix_no>=15;",
+   "fieldname": "masterbatch_mult_factor_mix_15",
+   "fieldtype": "Float",
+   "label": "MB Multp. Factor Mix 15"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=2;",
-   "fieldname": "composition_mult_factor_mixer_2",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 2"
+   "depends_on": "eval:doc.select_mix_no>=2;",
+   "fieldname": "composition_mult_factor_mix_2",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 2"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=3;",
-   "fieldname": "composition_mult_factor_mixer_3",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 3"
+   "depends_on": "eval:doc.select_mix_no>=3;",
+   "fieldname": "composition_mult_factor_mix_3",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 3"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=4;",
-   "fieldname": "composition_mult_factor_mixer_4",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 4"
+   "depends_on": "eval:doc.select_mix_no>=4;",
+   "fieldname": "composition_mult_factor_mix_4",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 4"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=5;",
-   "fieldname": "composition_mult_factor_mixer_5",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 5"
+   "depends_on": "eval:doc.select_mix_no>=5;",
+   "fieldname": "composition_mult_factor_mix_5",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 5"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=6;",
-   "fieldname": "composition_mult_factor_mixer_6",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 6"
+   "depends_on": "eval:doc.select_mix_no>=6;",
+   "fieldname": "composition_mult_factor_mix_6",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 6"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=7;",
-   "fieldname": "composition_mult_factor_mixer_7",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 7"
+   "depends_on": "eval:doc.select_mix_no>=7;",
+   "fieldname": "composition_mult_factor_mix_7",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 7"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=8;",
-   "fieldname": "composition_mult_factor_mixer_8",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 8"
+   "depends_on": "eval:doc.select_mix_no>=8;",
+   "fieldname": "composition_mult_factor_mix_8",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 8"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=9;",
-   "fieldname": "composition_mult_factor_mixer_9",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 9"
+   "depends_on": "eval:doc.select_mix_no>=9;",
+   "fieldname": "composition_mult_factor_mix_9",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 9"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=10;",
-   "fieldname": "composition_mult_factor_mixer_10",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 10"
+   "depends_on": "eval:doc.select_mix_no>=10;",
+   "fieldname": "composition_mult_factor_mix_10",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 10"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=11;",
-   "fieldname": "composition_mult_factor_mixer_11",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 11"
+   "depends_on": "eval:doc.select_mix_no>=11;",
+   "fieldname": "composition_mult_factor_mix_11",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 11"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=12;",
-   "fieldname": "composition_mult_factor_mixer_12",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 12"
+   "depends_on": "eval:doc.select_mix_no>=12;",
+   "fieldname": "composition_mult_factor_mix_12",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 12"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=13;",
-   "fieldname": "composition_mult_factor_mixer_13",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 13"
+   "depends_on": "eval:doc.select_mix_no>=13;",
+   "fieldname": "composition_mult_factor_mix_13",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 13"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=14;",
-   "fieldname": "composition_mult_factor_mixer_14",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 14"
+   "depends_on": "eval:doc.select_mix_no>=14;",
+   "fieldname": "composition_mult_factor_mix_14",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 14"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=15;",
-   "fieldname": "composition_mult_factor_mixer_15",
-   "fieldtype": "Data",
-   "label": "Comp. Multp. Factor Mixer 15"
+   "depends_on": "eval:doc.select_mix_no>=15;",
+   "fieldname": "composition_mult_factor_mix_15",
+   "fieldtype": "Float",
+   "label": "Comp. Multp. Factor Mix 15"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=2;",
-   "fieldname": "density_masterbatch_mixer_2",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 2"
+   "depends_on": "eval:doc.select_mix_no>=2;",
+   "fieldname": "density_masterbatch_mix_2",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 2"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=3;",
-   "fieldname": "density_masterbatch_mixer_3",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 3"
+   "depends_on": "eval:doc.select_mix_no>=3;",
+   "fieldname": "density_masterbatch_mix_3",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 3"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=4;",
-   "fieldname": "density_masterbatch_mixer_4",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 4"
+   "depends_on": "eval:doc.select_mix_no>=4;",
+   "fieldname": "density_masterbatch_mix_4",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 4"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=5;",
-   "fieldname": "density_masterbatch_mixer_5",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 5"
+   "depends_on": "eval:doc.select_mix_no>=5;",
+   "fieldname": "density_masterbatch_mix_5",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 5"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=6;",
-   "fieldname": "density_masterbatch_mixer_6",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 6"
+   "depends_on": "eval:doc.select_mix_no>=6;",
+   "fieldname": "density_masterbatch_mix_6",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 6"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=7;",
-   "fieldname": "density_masterbatch_mixer_7",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 7"
+   "depends_on": "eval:doc.select_mix_no>=7;",
+   "fieldname": "density_masterbatch_mix_7",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 7"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=8;",
-   "fieldname": "density_masterbatch_mixer_8",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 8"
+   "depends_on": "eval:doc.select_mix_no>=8;",
+   "fieldname": "density_masterbatch_mix_8",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 8"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=9;",
-   "fieldname": "density_masterbatch_mixer_9",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 9"
+   "depends_on": "eval:doc.select_mix_no>=9;",
+   "fieldname": "density_masterbatch_mix_9",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 9"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=10;",
-   "fieldname": "density_masterbatch_mixer_10",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 10"
+   "depends_on": "eval:doc.select_mix_no>=10;",
+   "fieldname": "density_masterbatch_mix_10",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 10"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=11;",
-   "fieldname": "density_masterbatch_mixer_11",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 11"
+   "depends_on": "eval:doc.select_mix_no>=11;",
+   "fieldname": "density_masterbatch_mix_11",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 11"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=12;",
-   "fieldname": "density_masterbatch_mixer_12",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 12"
+   "depends_on": "eval:doc.select_mix_no>=12;",
+   "fieldname": "density_masterbatch_mix_12",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 12"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=13;",
-   "fieldname": "density_masterbatch_mixer_13",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 13"
+   "depends_on": "eval:doc.select_mix_no>=13;",
+   "fieldname": "density_masterbatch_mix_13",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 13"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=14;",
-   "fieldname": "density_masterbatch_mixer_14",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 14"
+   "depends_on": "eval:doc.select_mix_no>=14;",
+   "fieldname": "density_masterbatch_mix_14",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 14"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=15;",
-   "fieldname": "density_masterbatch_mixer_15",
-   "fieldtype": "Data",
-   "label": "Density MB Mixer 15"
+   "depends_on": "eval:doc.select_mix_no>=15;",
+   "fieldname": "density_masterbatch_mix_15",
+   "fieldtype": "Float",
+   "label": "Density MB Mix 15"
   },
   {
-   "fieldname": "formulation_mixer_1",
-   "fieldtype": "Data",
+   "fieldname": "formulation_mix_1",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Formulation Parts per Hundred Mixer 1",
+   "label": "Formulation Parts per Hundred Mix 1",
    "reqd": 1
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=2;",
-   "fieldname": "formulation_mixer_2",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 2"
+   "depends_on": "eval:doc.select_mix_no>=2;",
+   "fieldname": "formulation_mix_2",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 2"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=3;",
-   "fieldname": "formulation_mixer_3",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 3"
+   "depends_on": "eval:doc.select_mix_no>=3;",
+   "fieldname": "formulation_mix_3",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 3"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=4;",
-   "fieldname": "formulation_mixer_4",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 4"
+   "depends_on": "eval:doc.select_mix_no>=4;",
+   "fieldname": "formulation_mix_4",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 4"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=5;",
-   "fieldname": "formulation_mixer_5",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 5"
+   "depends_on": "eval:doc.select_mix_no>=5;",
+   "fieldname": "formulation_mix_5",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 5"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=6;",
-   "fieldname": "formulation_mixer_6",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 6"
+   "depends_on": "eval:doc.select_mix_no>=6;",
+   "fieldname": "formulation_mix_6",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 6"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=7;",
-   "fieldname": "formulation_mixer_7",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 7"
+   "depends_on": "eval:doc.select_mix_no>=7;",
+   "fieldname": "formulation_mix_7",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 7"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=8;",
-   "fieldname": "formulation_mixer_8",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 8"
+   "depends_on": "eval:doc.select_mix_no>=8;",
+   "fieldname": "formulation_mix_8",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 8"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=9;",
-   "fieldname": "formulation_mixer_9",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 9"
+   "depends_on": "eval:doc.select_mix_no>=9;",
+   "fieldname": "formulation_mix_9",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 9"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=10;",
-   "fieldname": "formulation_mixer_10",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 10"
+   "depends_on": "eval:doc.select_mix_no>=10;",
+   "fieldname": "formulation_mix_10",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 10"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=11;",
-   "fieldname": "formulation_mixer_11",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 11"
+   "depends_on": "eval:doc.select_mix_no>=11;",
+   "fieldname": "formulation_mix_11",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 11"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=12;",
-   "fieldname": "formulation_mixer_12",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 12"
+   "depends_on": "eval:doc.select_mix_no>=12;",
+   "fieldname": "formulation_mix_12",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 12"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=13;",
-   "fieldname": "formulation_mixer_13",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 13"
+   "depends_on": "eval:doc.select_mix_no>=13;",
+   "fieldname": "formulation_mix_13",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 13"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=14;",
-   "fieldname": "formulation_mixer_14",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 14"
+   "depends_on": "eval:doc.select_mix_no>=14;",
+   "fieldname": "formulation_mix_14",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 14"
   },
   {
-   "depends_on": "eval:doc.select_mixer_no>=15;",
-   "fieldname": "formulation_mixer_15",
-   "fieldtype": "Data",
-   "label": "Formulation Parts per Hundred Mixer 15"
+   "depends_on": "eval:doc.select_mix_no>=15;",
+   "fieldname": "formulation_mix_15",
+   "fieldtype": "Float",
+   "label": "Formulation Parts per Hundred Mix 15"
   },
   {
    "fieldname": "col_break_4",

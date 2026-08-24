@@ -142,7 +142,7 @@ def get_weight_from_nodered():
 	data = json.loads(frappe.request.data)
 	order_no = data["work"]
 	weight = data["weight"]
-	mixer_no = data["mixer"]
+	mix_no = data["mix"]
 	ingredient_name = data["name"]
 	try:
 		doc = frappe.get_doc("Work Order LGM", "Work-Order-" + str(order_no))
@@ -150,7 +150,7 @@ def get_weight_from_nodered():
 		frappe.throw("Work Order does not exist")
 	ingredient_list = doc.weighing_table_lgm
 	for ingredient in ingredient_list:
-		if ingredient.ingredient == ingredient_name and ingredient.mixer_no == mixer_no:
+		if ingredient.ingredient == ingredient_name and ingredient.mix_no == mix_no:
 			ingredient.weighed = weight
 			doc.save()
 			doc.reload()
@@ -168,7 +168,7 @@ def build_ingredient_row(row_data):
 	return {
 		"ingredient": row_data.get("ingredient"),
 		"ingredient_weight": row_data.get("ingredient_weight"),
-		"mixer_no": row_data.get("mixer_no"),
+		"mix_no": row_data.get("mix_no"),
 		"weighed": row_data.get("weighed"),
 		"source_warehouse": row_data.get("source_warehouse"),
 	}

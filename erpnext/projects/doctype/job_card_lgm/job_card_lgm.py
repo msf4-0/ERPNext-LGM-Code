@@ -77,7 +77,7 @@ class JobCardLGM(Document):
 				self.append('ingredients', {
 					'ingredient': d.ingredient,
 					'required_weight': d.weighed,
-					'mixer_no': d.mixer_no
+					'mix_no': d.mix_no
 				})
 
 	def validate_job_card(self):
