@@ -12,9 +12,10 @@ class WorkOrderLGM(Document):
 	def before_cancel(self):
 		self.ignore_linked_doctypes = ["Stock Entry", "Job Card LGM"]
 
-	def on_cancel(self):
 		reclaim_unused_job_card_materials(self.name)
-		frappe.db.set_value("Work Order LGM", self.name, "status", "Cancelled")
+
+	def on_cancel(self):
+		self.db_set("status", "Cancelled")
 
 		frappe.publish_realtime(
             event="work_order_lgm_status_changed",
@@ -48,14 +49,16 @@ def reclaim_unused_job_card_materials(work_order_name):
 			job_card_doc = frappe.get_doc("Job Card LGM", jc.name)
 			for row in job_card_doc.ingredients:
 				if row.ingredient_weight:
-					weights[row.ingredient] = weights.get(row.ingredient, 0) 
-					+ flt(row.ingredient_weight)
+					weights[row.ingredient] = weights.get(row.ingredient, 0) + flt(row.ingredient_weight)
 
 			continue
 
 		for row in rows:
 			if row.get("ingredient_weight"):
 				weights[row["ingredient"]] = weights.get(row["ingredient"], 0) + flt(row["ingredient_weight"])
+
+	# Filter out any zero or negative total weights
+	weights = {k: v for k, v in weights.items() if flt(v) > 0}
 
 	if not weights:
 		return
