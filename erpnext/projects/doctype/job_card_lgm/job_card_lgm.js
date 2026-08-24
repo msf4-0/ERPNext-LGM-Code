@@ -191,6 +191,15 @@ frappe.ui.form.on('Job Card LGM', {
 	},
 
 	reset_timer: function (frm) {
+		// Defensive cleanup: if a dangling open row exists when we reset the
+		// flags, remove it instead of silently orphaning it in time_logs.
+		(frm.doc.time_logs || []).forEach((d) => {
+			if (d.from_time && !d.to_time) {
+				frappe.model.clear_doc(d.doctype, d.name);
+			}
+		});
+		frm.refresh_field('time_logs');
+
 		frm.set_value('started_time', '');
 		frm.set_value('job_started', 0);
 		frm.set_value('current_time', 0);
