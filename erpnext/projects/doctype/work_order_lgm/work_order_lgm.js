@@ -3,8 +3,6 @@
 
 frappe.ui.form.on('Work Order LGM', {
 	setup: function (frm) {
-		frm.events._hide_weighed_field(frm);
-
 		frm.call({
 			method: 'get_all_work_order',
 			callback: function (r) {
@@ -19,18 +17,6 @@ frappe.ui.form.on('Work Order LGM', {
 				});
 			},
 		});
-	},
-
-	_hide_weighed_field: function (frm) {
-		var df_weighed = frappe.meta.get_docfield(
-			'Ingredients Weighing Table LGM',
-			'weighed',
-			frm.doc.name,
-		);
-
-		if (df_weighed) {
-			df_weighed.hidden = 1;
-		}
 	},
 
 	onload: function (frm) {
