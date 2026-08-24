@@ -65,7 +65,7 @@ def reclaim_unused_job_card_materials(work_order_name):
 
 	if not wip:
 		frappe.throw(_("Cannot find WIP warehouse"))
-	if not wip:
+	if not unused_wip:
 			frappe.throw(_("Cannot find Unused Work In Progress warehouse"))
 
 	stock_entry_details = [
