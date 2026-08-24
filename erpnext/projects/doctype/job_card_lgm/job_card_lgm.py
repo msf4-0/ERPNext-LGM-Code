@@ -110,16 +110,87 @@ class JobCardLGM(Document):
 	def on_update(self):
 		self.update_work_order_status()
 
-	def on_submit(self):
-		self.validate_job_card()
-		self.update_work_order_status()
-
 	def on_cancel(self):
 		self.update_work_order_status()
 
 	def update_work_order_status(self):
 		if self.get('work_order'):
 			update_wo_status(self.work_order)
+
+	def on_submit(self):
+		self.validate_job_card()
+		self.update_work_order_status()
+		self.create_material_issue_on_submit()
+
+	def create_material_issue_on_submit(self):
+		# Prevent duplicate creation if a submitted Stock Entry already exists for this Work Order
+		existing_entry = frappe.db.get_value(
+			"Stock Entry",
+			{
+				"work_order_lgm": self.work_order,
+				"stock_entry_type": "Material Issue",
+				"docstatus": 1
+			},
+			"name"
+		)
+		if existing_entry:
+			return
+
+		wip = _get_wip_warehouse()
+		ingredient_list = self.get("ingredients", [])
+		weights = {}
+
+		for row in ingredient_list:
+			if row.weighed:
+				ingredient_name = row.ingredient
+				weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row.weighed)
+
+		if not weights:
+			return
+
+		# 2. Re-verify stock server-side before processing
+		shortfalls = _get_stock_shortfalls(weights)
+		if shortfalls:
+			frappe.throw(_("Cannot submit: Insufficient stock for one or more ingredients in WIP warehouse."))
+
+		stock_entry_details = []
+		for ingredient_name, ingredient_weight in weights.items():
+			stock_entry_details.append(dict(
+				s_warehouse=wip,
+				item_code=ingredient_name,
+				qty=ingredient_weight
+			))
+
+		# 3. Create and submit within the document commit transaction
+		stock_entry = frappe.get_doc(dict(
+			doctype="Stock Entry",
+			stock_entry_type="Material Issue",
+			work_order_lgm=self.work_order,
+			from_warehouse=wip,
+			items=stock_entry_details,
+		)).insert()
+		stock_entry.submit()
+
+# Whitelisted function called by JS client-side purely for stock checking
+@frappe.whitelist()
+def check_stock_availability(doc):
+    doc = json.loads(doc)
+    ingredient_list = doc.get("ingredients", [])
+    weights = {}
+
+    for row in ingredient_list:
+        if row.get("weighed"):
+            ingredient_name = row.get("ingredient")
+            weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row["weighed"])
+
+    if not weights:
+        return True
+
+    shortfalls = _get_stock_shortfalls(weights)
+    if shortfalls:
+        return shortfalls
+
+    return True
 
 @frappe.whitelist()
 def get_ingredients(doc):
