@@ -151,7 +151,7 @@ def get_weight_from_nodered():
 	ingredient_list = doc.weighing_table_lgm
 	for ingredient in ingredient_list:
 		if ingredient.ingredient == ingredient_name and ingredient.mix_no == mix_no:
-			ingredient.weighed = weight
+			ingredient.actual_weight = weight
 			doc.save()
 			doc.reload()
 			return "found"
@@ -169,7 +169,7 @@ def build_ingredient_row(row_data):
 		"ingredient": row_data.get("ingredient"),
 		"ingredient_weight": row_data.get("ingredient_weight"),
 		"mix_no": row_data.get("mix_no"),
-		"weighed": row_data.get("weighed"),
+		"actual_weight": row_data.get("actual_weight"),
 		"source_warehouse": row_data.get("source_warehouse"),
 	}
 

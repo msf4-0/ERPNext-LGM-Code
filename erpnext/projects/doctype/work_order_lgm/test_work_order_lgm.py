@@ -95,7 +95,7 @@ class TestWorkOrderLGM(unittest.TestCase):
         return {
             "ingredient_type": ingredient_type,
             "ingredient": ingredient_name,
-            "weighed": weight,
+            "actual_weight": weight,
             "mix_no": mix_no
         }
 

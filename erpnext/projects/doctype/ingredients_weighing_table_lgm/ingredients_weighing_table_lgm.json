@@ -8,7 +8,7 @@
   "ingredient_type",
   "ingredient_weight",
   "mixer_no",
-  "weighed",
+  "actual_weight",
   "source_warehouse"
  ],
  "fields": [
@@ -46,10 +46,10 @@
    "columns": 1
   },
   {
-   "fieldname": "weighed",
+   "fieldname": "actual_weight",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Weighed",
+   "label": "Actual Weight",
    "columns": 1
   },
   {

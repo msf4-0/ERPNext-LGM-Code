@@ -76,7 +76,7 @@ class JobCardLGM(Document):
 			if self.get('ingredient_type') == d.get('ingredient_type'):
 				self.append('ingredients', {
 					'ingredient': d.ingredient,
-					'required_weight': d.weighed,
+					'required_weight': d.actual_weight,
 					'mix_no': d.mix_no
 				})
 
@@ -146,9 +146,9 @@ class JobCardLGM(Document):
 		weights = {}
 
 		for row in ingredient_list:
-			if row.weighed:
+			if row.actual_weight:
 				ingredient_name = row.ingredient
-				weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row.weighed)
+				weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row.actual_weight)
 
 		if not weights:
 			return
@@ -185,9 +185,9 @@ def check_stock_availability(doc):
     weights = {}
 
     for row in ingredient_list:
-        if row.get("weighed"):
+        if row.get("actual_weight"):
             ingredient_name = row.get("ingredient")
-            weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row["weighed"])
+            weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row["actual_weight"])
 
     if not weights:
         return True
@@ -256,10 +256,10 @@ def create_material_issue(doc):
 	# override, if the human picked a fallback for this ingredient, wins over
 	# the row's own source_warehouse
 	for row in ingredient_list:
-		if row.get("weighed"):
+		if row.get("actual_weight"):
 			ingredient_name = row.get("ingredient")
 			key = ingredient_name
-			weights[key] = weights.get(key, 0) + float(row["weighed"])
+			weights[key] = weights.get(key, 0) + float(row["actual_weight"])
 
 	if not weights:
 		return True
