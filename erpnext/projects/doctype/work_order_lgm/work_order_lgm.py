@@ -6,9 +6,94 @@ from __future__ import unicode_literals
 import frappe, json
 from frappe.model.document import Document
 from frappe import _
+from frappe.utils import flt
 
 class WorkOrderLGM(Document):
-    pass
+	def before_cancel(self):
+		self.ignore_linked_doctypes = ["Stock Entry", "Job Card LGM"]
+
+	def on_cancel(self):
+		reclaim_unused_job_card_materials(self.name)
+
+def reclaim_unused_job_card_materials(work_order_name):
+	UNSUBMITTED_STATUS_ENUM = 0
+	SUBMITTED_STATUS_ENUM = 1
+	CANCELLED_STATUS_ENUM = 2
+
+	work_order_doc = frappe.get_doc("Work Order LGM", work_order_name)
+	ingredients_by_type = get_ingredients(work_order_doc)
+
+	wo_job_cards = frappe.get_all(
+		"Job Card LGM", 
+		filters = {"work_order": work_order_name}, 
+		fields = ["name", "docstatus", "ingredient_type"]
+		)
+	job_card_by_type = {jc.ingredient_type: jc for jc in wo_job_cards}
+
+	weights = {}
+
+	for ingredient_type, rows in ingredients_by_type.items():
+		jc = job_card_by_type.get(ingredient_type)
+
+		if jc and jc.docstatus in (SUBMITTED_STATUS_ENUM, CANCELLED_STATUS_ENUM):
+			continue
+
+		if jc and jc.docstatus == UNSUBMITTED_STATUS_ENUM:
+			job_card_doc = frappe.get_doc("Job Card LGM", jc.name)
+			for row in job_card_doc.ingredients:
+				if row.ingredient_weight:
+					weights[row.ingredient] = weights.get(row.ingredient, 0) 
+					+ flt(row.ingredient_weight)
+
+			continue
+
+		for row in rows:
+			if row.get("ingredient_weight"):
+				weights[row["ingredient"]] = weights.get(row["ingredient"], 0) + flt(row["ingredient_weight"])
+
+	if not weights:
+		return
+
+	wip = _get_wip_warehouse()
+	unused_wip = _get_unused_wip_warehouse()
+
+	if not wip:
+		frappe.throw(_("Cannot find WIP warehouse"))
+	if not wip:
+			frappe.throw(_("Cannot find Unused Work In Progress warehouse"))
+
+	stock_entry_details = [
+		dict(s_warehouse = wip, t_warehouse = unused_wip, item_code = ingredient_name, qty=qty) 
+		for ingredient_name, qty in weights.items()
+	]
+
+	stock_entry = frappe.get_doc(dict(
+		doctype = "Stock Entry",
+		stock_entry_type = "Material Transfer",
+		work_order_lgm = work_order_name,
+		items = stock_entry_details,
+	)).insert()
+	stock_entry.submit()
+	
+def _get_wip_warehouse():
+	warehouses = frappe.get_all("Warehouse", fields="name")
+	wip = None
+	for warehouse in warehouses:
+		if "Work In" in warehouse["name"] and "Unused" not in warehouse["name"]:
+			wip = warehouse["name"]
+
+	return wip
+
+def _get_unused_wip_warehouse():
+	warehouse_name = "Unused Work In Progress"
+
+	warehouses = frappe.get_all("Warehouse", filters = {"name": ["like", "%" + warehouse_name + "%"]}, fields="name")
+	if not warehouses:
+		frappe.throw(_('No warehouse matching name {0} was found').format(warehouse_name))
+
+	unused_wip = warehouses[0]["name"]
+
+	return unused_wip
 
 @frappe.whitelist(allow_guest=True)
 def get_weight_from_nodered():
@@ -191,13 +276,7 @@ def create_material_transfer(doc, warehouse_overrides=None):
 	if shortfalls:
 		return shortfalls
 
-	# get wip warehouse — unchanged substring-match logic, left as-is (out of
-	# scope for this pass)
-	warehouses = frappe.get_all("Warehouse", fields="name")
-	wip = None
-	for warehouse in warehouses:
-		if "Work In" in warehouse["name"]:
-			wip = warehouse["name"]
+	wip = _get_wip_warehouse()
 
 	# put each (ingredient, source_warehouse) pair and its total weight into
 	# the stock entry's item rows
