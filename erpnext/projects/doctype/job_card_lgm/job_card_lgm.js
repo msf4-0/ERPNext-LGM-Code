@@ -23,7 +23,10 @@ frappe.ui.form.on('Job Card LGM', {
 		frappe.flags.pause_job = 0;
 		frappe.flags.resume_job = 0;
 
-		if (frm.doc.work_order) {
+		if (
+			frm.doc.work_order &&
+			(!frm.doc.ingredients || !frm.doc.ingredients.length)
+		) {
 			frm.trigger('for_quantity');
 			frm.trigger('fetch_instructions');
 		}
@@ -69,18 +72,13 @@ frappe.ui.form.on('Job Card LGM', {
 		}
 		frm.refresh_field('weighing_table_lgm');
 
-		if (frm.doc.work_order) {
+		if (
+			frm.doc.work_order &&
+			(!frm.doc.ingredients || !frm.doc.ingredients.length)
+		) {
 			frm.trigger('for_quantity');
 			frm.trigger('fetch_instructions');
 		}
-	},
-
-	before_save: function (frm) {
-		frm.trigger('for_quantity');
-	},
-
-	on_submit: function (frm) {
-		frm.trigger('for_quantity');
 	},
 
 	prepare_timer_buttons: function (frm) {
@@ -162,7 +160,9 @@ frappe.ui.form.on('Job Card LGM', {
 			frm.set_value('current_time', 0);
 		}
 
-		frm.trigger('for_quantity');
+		if (!frm.doc.ingredients || !frm.doc.ingredients.length) {
+			frm.trigger('for_quantity');
+		}
 
 		frm.save();
 	},
@@ -324,8 +324,8 @@ frappe.ui.form.on('Job Card LGM', {
 	},
 
 	before_submit(frm) {
-		var ingredients_list = frm.doc['weighing_table_lgm'] || [];
-		var no_of_ingredients = frm.doc['weighing_table_lgm'].length;
+		var ingredients_list = frm.doc['ingredients'] || [];
+		var no_of_ingredients = ingredients_list.length;
 		for (var i = 0; i < no_of_ingredients; i++) {
 			if (ingredients_list[i]['weighed'] == undefined) {
 				frm.reload_doc();
