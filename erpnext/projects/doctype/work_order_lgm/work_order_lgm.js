@@ -3,6 +3,8 @@
 
 frappe.ui.form.on('Work Order LGM', {
 	setup: function (frm) {
+		frm.events._hide_weighed_field(frm);
+
 		frm.call({
 			method: 'get_all_work_order',
 			callback: function (r) {
@@ -19,18 +21,19 @@ frappe.ui.form.on('Work Order LGM', {
 		});
 	},
 
-	onload: function (frm) {
+	_hide_weighed_field: function (frm) {
 		var df_weighed = frappe.meta.get_docfield(
 			'Ingredients Weighing Table LGM',
 			'weighed',
 			frm.doc.name,
 		);
+
 		if (df_weighed) {
 			df_weighed.hidden = 1;
-			df_weighed.read_only = 1;
 		}
-		frm.refresh_field('weighing_table_lgm');
+	},
 
+	onload: function (frm) {
 		frappe.realtime.on('work_order_lgm_status_changed', function (data) {
 			if (data.work_order == frm.doc.name) {
 				frm.reload_doc();
@@ -39,6 +42,13 @@ frappe.ui.form.on('Work Order LGM', {
 	},
 
 	refresh: function (frm) {
+		if (!frm.__reloaded_this_view) {
+			frm.__reloaded_this_view = true;
+			frm.reload_doc();
+			return;
+		}
+		frm.__reloaded_this_view = false;
+
 		if (frm.doc.status) {
 			var status_colors = {
 				'Not Started': 'orange',
@@ -75,6 +85,13 @@ frappe.ui.form.on('Work Order LGM', {
 		var ingredients_list = frm.doc['weighing_table_lgm'] || [];
 		var no_of_ingredients = frm.doc['weighing_table_lgm'].length;
 		for (var i = 0; i < no_of_ingredients; i++) {
+			if (ingredients_list[i]['weighed'] == undefined) {
+				frm.reload_doc();
+				frappe.throw({
+					message: __(`Ingredient ${i + 1} weight is not measured yet.`),
+					indicator: 'red',
+				});
+			}
 			if (!ingredients_list[i]['source_warehouse']) {
 				frappe.throw({
 					message: __(
@@ -112,7 +129,7 @@ frappe.ui.form.on('Work Order LGM', {
 				callback: (r) => {
 					var response = r.message;
 
-					if (response === true) {
+					if (response === true || response === 'NO_MATERIALS') {
 						return resolve();
 					}
 
