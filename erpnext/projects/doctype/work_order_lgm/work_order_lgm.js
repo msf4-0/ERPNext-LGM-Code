@@ -108,7 +108,7 @@ frappe.ui.form.on('Work Order LGM', {
 			};
 
 			frm.call({
-				method: 'create_material_transfer',
+				method: 'check_stock_availability',
 				args: { doc: frm.doc },
 				callback: (r) => {
 					var response = r.message;

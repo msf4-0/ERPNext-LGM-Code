@@ -9,18 +9,51 @@ from frappe import _
 from frappe.utils import flt
 
 class WorkOrderLGM(Document):
-	def before_cancel(self):
-		self.ignore_linked_doctypes = ["Stock Entry", "Job Card LGM"]
+    def on_submit(self):
+        self.create_material_transfer_on_submit()
 
-		reclaim_unused_job_card_materials(self.name)
+    def create_material_transfer_on_submit(self):
+        weights = {}
+        # Use dot notation for Frappe Document child rows
+        for row in self.weighing_table_lgm:
+            source_warehouse = row.source_warehouse
+            if not source_warehouse:
+                frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(row.ingredient))
+            
+            if row.ingredient_weight:
+                key = (row.ingredient, source_warehouse)
+                weights[key] = weights.get(key, 0) + flt(row.ingredient_weight)
 
-	def on_cancel(self):
-		self.db_set("status", "Cancelled")
+        if not weights:
+            return
 
-		frappe.publish_realtime(
+        # Double-check stock on the server side to ensure validity
+        shortfalls = _get_stock_shortfalls(weights)
+        if shortfalls:
+            frappe.throw(_("Cannot submit: Insufficient stock for one or more ingredients."))
+
+        wip = _get_wip_warehouse()
+        stock_entry_details = []
+        for (ingredient_name, source_warehouse), ingredient_weight in weights.items():
+            stock_entry_details.append({
+                "s_warehouse": source_warehouse,
+                "t_warehouse": wip,
+                "item_code": ingredient_name,
+                "qty": ingredient_weight
+            })
+
+        create_unique_stock_entry(self.name, "Material Transfer", stock_entry_details)
+
+    def before_cancel(self):
+        self.ignore_linked_doctypes = ["Stock Entry", "Job Card LGM"]
+        reclaim_unused_job_card_materials(self.name)
+
+    def on_cancel(self):
+        self.db_set("status", "Cancelled")
+        frappe.publish_realtime(
             event="work_order_lgm_status_changed",
             message={"work_order": self.name, "status": "Cancelled"}
-		)
+        )
 
 def reclaim_unused_job_card_materials(work_order_name):
 	UNSUBMITTED_STATUS_ENUM = 0
@@ -241,74 +274,32 @@ def _get_stock_shortfalls(weights):
 
 	return shortfalls
 
-# function to create the Material Transfer stock entry for a work order.
-# warehouse_overrides is an optional {ingredient: fallback_warehouse} map —
-# populated by the user when check_stock_availability found that ingredient's
-# normal source_warehouse short, and they picked a different warehouse to
-# pull from instead. Any ingredient not in the map uses its own row-level
-# source_warehouse as usual.
 @frappe.whitelist()
-def create_material_transfer(doc, warehouse_overrides=None):
-	doc = json.loads(doc)
-	if warehouse_overrides:
-		if isinstance(warehouse_overrides, str):
-			warehouse_overrides = json.loads(warehouse_overrides)
-	else:
-		warehouse_overrides = {}
+def check_stock_availability(doc):
+    doc = json.loads(doc)
+    ingredient_list = doc.get("weighing_table_lgm", [])
+    weights = {}
+    
+    for row in ingredient_list:
+        ingredient_name = row.get("ingredient")
+        source_warehouse = row.get("source_warehouse")
+        
+        # We skip missing warehouses here because the JS/Python validate will catch them
+        if not source_warehouse:
+            continue
+            
+        if row.get("ingredient_weight"):
+            key = (ingredient_name, source_warehouse)
+            weights[key] = weights.get(key, 0) + flt(row.get("ingredient_weight"))
 
-	ingredient_list = doc.get("weighing_table_lgm", [])
-	weights = {}
-	# summing up the weights based on (ingredient, source_warehouse) — the
-	# override, if the human picked a fallback for this ingredient, wins over
-	# the row's own source_warehouse
-	for row in ingredient_list:
-		ingredient_name = row["ingredient"]
-		source_warehouse = warehouse_overrides.get(ingredient_name) or row.get("source_warehouse")
-		if not source_warehouse:
-			frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(ingredient_name))
+    if not weights:
+        return True
 
-		if row.get("ingredient_weight"):
-			key = (ingredient_name, source_warehouse)
-			weights[key] = weights.get(key, 0) + float(row["ingredient_weight"])
+    shortfalls = _get_stock_shortfalls(weights)
+    if shortfalls:
+        return shortfalls
 
-	if not weights:
-		return True
-
-	# re-check availability against the *final resolved* warehouse for each
-	# ingredient (its own source_warehouse, or the human-provided override).
-	# This is necessary because the earlier check_stock_availability call only
-	# ever validated each row's original source_warehouse — it has no way of
-	# knowing whether a fallback warehouse the human just picked is itself
-	# short. Same shape of result as check_stock_availability, so the caller
-	# can reuse the same dialog logic if this comes back non-empty.
-	shortfalls = _get_stock_shortfalls(weights)
-	if shortfalls:
-		return shortfalls
-
-	wip = _get_wip_warehouse()
-
-	# put each (ingredient, source_warehouse) pair and its total weight into
-	# the stock entry's item rows
-	stock_entry_details = []
-	for (ingredient_name, source_warehouse), ingredient_weight in weights.items():
-		stock_entry_details.append(dict(
-			s_warehouse = source_warehouse,
-			t_warehouse = wip,
-			item_code = ingredient_name,
-			qty = ingredient_weight
-		))
-
-	# insert stock entry record here — no single header-level from_warehouse
-	# any more, since source warehouses now differ per row
-	stock_entry = frappe.get_doc(dict(
-		doctype = "Stock Entry",
-		stock_entry_type = "Material Transfer",
-		work_order_lgm = doc["name"],
-		to_warehouse = wip,
-		items = stock_entry_details,
-	)).insert()
-	stock_entry.submit()
-	return True
+    return True
 
 # function to query all the request sheet that has no work order
 @frappe.whitelist()
@@ -362,36 +353,54 @@ def _issue_finished_goods(work_order_name):
     request_sheet = frappe.get_doc("Technological Request Sheets LGM", work_order.request_sheet_link)
     
     fg_warehouse = _get_finished_goods_warehouse()
-    
-    # Items were created with the format: reference_no/1, reference_no/2, etc.
     item_code_prefix = request_sheet.reference_no + "/"
     
-    # Query all items that start with this exact prefix
     created_items = frappe.get_all(
         "Item", 
         filters={"item_code": ["like", f"{item_code_prefix}%"]}, 
         fields=["item_code"]
     )
 
-    # Build the stock entry rows
     stock_entry_details = []
     for item in created_items:
         stock_entry_details.append({
             "t_warehouse": fg_warehouse,
             "item_code": item.item_code,
-            "qty": 1
+            "qty": 1,
+            "allow_zero_valuation_rate": 1
         })
 
-    # Create and submit the Material Receipt
+    create_unique_stock_entry(work_order_name, "Material Receipt", stock_entry_details)
+
+def create_unique_stock_entry(work_order_name, entry_type, items_list):
+    """
+    Creates and submits a Stock Entry if one does not already exist.
+    Returns True if created successfully, False if it already exists.
+    """
+    # 1. Global Idempotency Check
+    existing_entry = frappe.db.get_value(
+        "Stock Entry",
+        {
+            "work_order_lgm": work_order_name,
+            "stock_entry_type": entry_type,
+            "docstatus": 1
+        },
+        "name"
+    )
+    
+    if existing_entry:
+        return False  # Alerts the caller that the entry already exists
+
+    # 2. Dynamic Creation
     stock_entry = frappe.get_doc({
         "doctype": "Stock Entry",
-        "stock_entry_type": "Material Receipt", 
+        "stock_entry_type": entry_type,
         "work_order_lgm": work_order_name,
-        "to_warehouse": fg_warehouse,
-        "items": stock_entry_details
+        "items": items_list
     }).insert()
     
     stock_entry.submit()
+    return True
 
 def _get_finished_goods_warehouse():
     # Use a SQL wildcard to match "Finished Goods" followed by anything (like the company abbreviation)
