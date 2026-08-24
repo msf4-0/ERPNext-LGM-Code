@@ -158,11 +158,11 @@ class JobCardLGM(Document):
 			frappe.throw(_("Cannot submit: Insufficient stock for one or more ingredients in WIP warehouse."))
 
 		stock_entry_details = []
-		for ingredient_name, ingredient_weight in weights.items():
+		for ingredient_name, requested_weight in weights.items():
 			stock_entry_details.append(dict(
 				s_warehouse=wip,
 				item_code=ingredient_name,
-				qty=ingredient_weight
+				qty=requested_weight
 			))
 
 		# Include job_card_lgm when inserting the new Stock Entry
@@ -278,11 +278,11 @@ def create_material_issue(doc):
 	# put each (ingredient, source_warehouse) pair and its total weight into
 	# the stock entry's item rows
 	stock_entry_details = []
-	for ingredient_name, ingredient_weight in weights.items():
+	for ingredient_name, requested_weight in weights.items():
 		stock_entry_details.append(dict(
 			s_warehouse = wip,
 			item_code = ingredient_name,
-			qty = ingredient_weight
+			qty = requested_weight
 		))
 
 	# insert stock entry record here — no single header-level from_warehouse

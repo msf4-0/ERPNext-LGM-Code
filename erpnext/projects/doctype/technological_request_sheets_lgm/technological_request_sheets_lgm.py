@@ -128,7 +128,7 @@ def create_work_order_lgm(doc):
 						ingredient_list.append({
 							"ingredient_type": ingredient_type,
 							"ingredient": ingredient_name,
-							"ingredient_weight": weight,
+							"requested_weight": weight,
 							"mix_no": i
 						})
 

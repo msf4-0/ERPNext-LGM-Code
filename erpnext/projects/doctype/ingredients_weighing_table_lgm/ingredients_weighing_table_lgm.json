@@ -6,7 +6,7 @@
  "field_order": [
   "ingredient",
   "ingredient_type",
-  "ingredient_weight",
+  "requested_weight",
   "mixer_no",
   "actual_weight",
   "source_warehouse"
@@ -38,10 +38,10 @@
    "columns": 1
   },
   {
-   "fieldname": "ingredient_weight",
+   "fieldname": "requested_weight",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Weight",
+   "label": "Requested Weight",
    "read_only": 1,
    "columns": 1
   },

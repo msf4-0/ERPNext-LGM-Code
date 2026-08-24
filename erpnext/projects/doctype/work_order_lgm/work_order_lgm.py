@@ -20,9 +20,9 @@ class WorkOrderLGM(Document):
             if not source_warehouse:
                 frappe.throw(_("Source Warehouse is not set for ingredient {0}").format(row.ingredient))
             
-            if row.ingredient_weight:
+            if row.requested_weight:
                 key = (row.ingredient, source_warehouse)
-                weights[key] = weights.get(key, 0) + flt(row.ingredient_weight)
+                weights[key] = weights.get(key, 0) + flt(row.requested_weight)
 
         if not weights:
             return
@@ -34,12 +34,12 @@ class WorkOrderLGM(Document):
 
         wip = _get_wip_warehouse()
         stock_entry_details = []
-        for (ingredient_name, source_warehouse), ingredient_weight in weights.items():
+        for (ingredient_name, source_warehouse), requested_weight in weights.items():
             stock_entry_details.append({
                 "s_warehouse": source_warehouse,
                 "t_warehouse": wip,
                 "item_code": ingredient_name,
-                "qty": ingredient_weight
+                "qty": requested_weight
             })
 
         create_unique_stock_entry(self.name, "Material Transfer", stock_entry_details)
@@ -81,14 +81,14 @@ def reclaim_unused_job_card_materials(work_order_name):
 		if jc and jc.docstatus == UNSUBMITTED_STATUS_ENUM:
 			job_card_doc = frappe.get_doc("Job Card LGM", jc.name)
 			for row in job_card_doc.ingredients:
-				if row.ingredient_weight:
-					weights[row.ingredient] = weights.get(row.ingredient, 0) + flt(row.ingredient_weight)
+				if row.requested_weight:
+					weights[row.ingredient] = weights.get(row.ingredient, 0) + flt(row.requested_weight)
 
 			continue
 
 		for row in rows:
-			if row.get("ingredient_weight"):
-				weights[row["ingredient"]] = weights.get(row["ingredient"], 0) + flt(row["ingredient_weight"])
+			if row.get("requested_weight"):
+				weights[row["ingredient"]] = weights.get(row["ingredient"], 0) + flt(row["requested_weight"])
 
 	# Filter out any zero or negative total weights
 	weights = {k: v for k, v in weights.items() if flt(v) > 0}
@@ -167,7 +167,7 @@ def build_ingredient_row(row_data):
 	"""
 	return {
 		"ingredient": row_data.get("ingredient"),
-		"ingredient_weight": row_data.get("ingredient_weight"),
+		"requested_weight": row_data.get("requested_weight"),
 		"mix_no": row_data.get("mix_no"),
 		"actual_weight": row_data.get("actual_weight"),
 		"source_warehouse": row_data.get("source_warehouse"),
@@ -288,9 +288,9 @@ def check_stock_availability(doc):
         if not source_warehouse:
             continue
             
-        if row.get("ingredient_weight"):
+        if row.get("requested_weight"):
             key = (ingredient_name, source_warehouse)
-            weights[key] = weights.get(key, 0) + flt(row.get("ingredient_weight"))
+            weights[key] = weights.get(key, 0) + flt(row.get("requested_weight"))
 
     if not weights:
         return True
