@@ -41,6 +41,10 @@ class JobCardLGM(Document):
 
 			self.total_completed_qty = flt(self.total_completed_qty, self.precision("total_completed_qty"))
 
+			if self.for_quantity and self.total_completed_qty > self.for_quantity:
+				frappe.throw(_("Total completed qty ({0}) cannot exceed qty for manufacture ({1}). This usually means the Job Card has a duplicate or orphaned time log row.")
+				 .format(frappe.bold(self.total_completed_qty), frappe.bold(self.for_quantity)))
+
 	def get_overlap_for(self, args):
 		existing = frappe.db.sql("""select jc.name as name from
 			`tabJob Card Time Log` jctl, `tabJob Card` jc where jctl.parent = jc.name and
