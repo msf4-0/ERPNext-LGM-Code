@@ -84,6 +84,18 @@ frappe.ui.form.on('Job Card LGM', {
 		frm.trigger('make_dashboard');
 		if (!frm.doc.job_started) {
 			frm.add_custom_button(__('Start'), () => {
+				var ingredients_list = frm.doc['ingredients'] || [];
+				for (var i = 0; i < ingredients_list.length; i++) {
+					if (ingredients_list[i]['weighed'] == undefined) {
+						frappe.throw({
+							message: __(
+								`Ingredient ${i + 1} (${ingredients_list[i]['ingredient']}) has no actual weight value, please ensure all ingredients have their actual weight filled out before starting.`,
+							),
+							indicator: 'orange',
+						});
+					}
+				}
+
 				if (!frm.doc.employee) {
 					frappe.prompt(
 						{
