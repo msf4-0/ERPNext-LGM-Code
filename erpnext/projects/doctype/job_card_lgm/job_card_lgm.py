@@ -127,11 +127,12 @@ class JobCardLGM(Document):
 		self.create_material_issue_on_submit()
 
 	def create_material_issue_on_submit(self):
-		# Prevent duplicate creation if a submitted Stock Entry already exists for this Work Order
+		# Prevent duplicate creation if a submitted Stock Entry already exists for THIS Job Card
 		existing_entry = frappe.db.get_value(
 			"Stock Entry",
 			{
 				"work_order_lgm": self.work_order,
+				"job_card_lgm": self.name, # Now checks at the Job Card level
 				"stock_entry_type": "Material Issue",
 				"docstatus": 1
 			},
@@ -152,7 +153,6 @@ class JobCardLGM(Document):
 		if not weights:
 			return
 
-		# 2. Re-verify stock server-side before processing
 		shortfalls = _get_stock_shortfalls(weights)
 		if shortfalls:
 			frappe.throw(_("Cannot submit: Insufficient stock for one or more ingredients in WIP warehouse."))
@@ -165,14 +165,16 @@ class JobCardLGM(Document):
 				qty=ingredient_weight
 			))
 
-		# 3. Create and submit within the document commit transaction
+		# Include job_card_lgm when inserting the new Stock Entry
 		stock_entry = frappe.get_doc(dict(
 			doctype="Stock Entry",
 			stock_entry_type="Material Issue",
 			work_order_lgm=self.work_order,
+			job_card_lgm=self.name, # Link the Stock Entry back to this Job Card
 			from_warehouse=wip,
 			items=stock_entry_details,
 		)).insert()
+
 		stock_entry.submit()
 
 # Whitelisted function called by JS client-side purely for stock checking
