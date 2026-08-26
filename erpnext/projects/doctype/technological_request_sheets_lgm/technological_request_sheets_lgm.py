@@ -107,6 +107,12 @@ def create_work_order_lgm(doc):
 	# Prevent duplicate work orders
 	if len(frappe.db.get_all('Work Order LGM', fields="name", filters={"request_sheet_link": doc["name"]})) > 0:
 		frappe.throw(_("Work Order for current technological request sheet already exists."))
+
+	default_wh = frappe.db.get_value(
+		"Warehouse",
+		{"name": ["like", "Unused Work In Progress%"]},
+		"name"
+	)
 	
 	ingredient_list = []
 	compounding_list = doc.get("compounding_ingredients", [])
@@ -129,7 +135,8 @@ def create_work_order_lgm(doc):
 							"ingredient_type": ingredient_type,
 							"ingredient": ingredient_name,
 							"requested_weight": weight,
-							"mix_no": i
+							"mix_no": i,
+							"source_warehouse": default_wh
 						})
 
 	# Generate and insert the Work Order document
