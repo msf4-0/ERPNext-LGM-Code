@@ -60,12 +60,43 @@ frappe.ui.form.on('Work Order LGM', {
 						doc: frm.doc,
 					},
 					callback: function (r) {
-						frappe.msgprint({
-							message: __('Job Card is created'),
-							indicator: 'green',
-						});
+						if (
+							r.message &&
+							Array.isArray(r.message) &&
+							r.message.length > 0
+						) {
+							var first_job_card = r.message[0];
+
+							frappe.msgprint({
+								title: __('Success'),
+								message: __(
+									'Job Cards have been successfully created.',
+								),
+								indicator: 'green',
+								primary_action: {
+									label: __(
+										`View First Job Card (${first_job_card.type})`,
+									),
+									action: function () {
+										frappe.set_route(
+											'Form',
+											'Job Card LGM',
+											first_job_card.name,
+										);
+										frappe.hide_msgprint();
+									},
+								},
+							});
+						} else {
+							frappe.msgprint({
+								message: __(
+									'No valid job cards to be created, skipped.',
+								),
+								indicator: 'green',
+							});
+						}
+
 						frm.reload_doc();
-						return;
 					},
 				});
 			});
