@@ -250,7 +250,7 @@ def create_job_card_lgm(doc):
     for job_card_lgm in job_cards:
         job_card_lgm.insert()
 
-    return True
+    return [{"name": jc.name, "type": jc.ingredient_type} for jc in job_cards]
 
 def _get_stock_shortfalls(weights):
 	"""
