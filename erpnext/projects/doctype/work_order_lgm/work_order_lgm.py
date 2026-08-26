@@ -137,26 +137,6 @@ def _get_unused_wip_warehouse():
 
 	return unused_wip
 
-@frappe.whitelist(allow_guest=True)
-def get_weight_from_nodered():
-	data = json.loads(frappe.request.data)
-	order_no = data["work"]
-	weight = data["weight"]
-	mix_no = data["mix"]
-	ingredient_name = data["name"]
-	try:
-		doc = frappe.get_doc("Work Order LGM", "Work-Order-" + str(order_no))
-	except:
-		frappe.throw("Work Order does not exist")
-	ingredient_list = doc.weighing_table_lgm
-	for ingredient in ingredient_list:
-		if ingredient.ingredient == ingredient_name and ingredient.mix_no == mix_no:
-			ingredient.actual_weight = weight
-			doc.save()
-			doc.reload()
-			return "found"
-	return "not found"
-
 def build_ingredient_row(row_data):
 	"""
 	Single source of truth for the row shape used both when Job Cards are first
