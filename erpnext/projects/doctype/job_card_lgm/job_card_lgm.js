@@ -43,24 +43,7 @@ frappe.ui.form.on('Job Card LGM', {
 	},
 
 	onload: function (frm) {
-		var df_type = frappe.meta.get_docfield(
-			'Ingredients Weighing Table LGM',
-			'ingredient_type',
-			frm.doc.name,
-		);
-		if (df_type) {
-			df_type.hidden = 1;
-		}
-
-		var df_warehouse = frappe.meta.get_docfield(
-			'Ingredients Weighing Table LGM',
-			'source_warehouse',
-			frm.doc.name,
-		);
-		if (df_warehouse) {
-			df_warehouse.read_only = 1;
-		}
-		frm.refresh_field('weighing_table_lgm');
+		frm.events._update_ingredients_weighing_table(frm);
 
 		if (
 			frm.doc.work_order &&
@@ -69,6 +52,53 @@ frappe.ui.form.on('Job Card LGM', {
 			frm.trigger('for_quantity');
 			frm.trigger('fetch_instructions');
 		}
+	},
+
+	_update_ingredients_weighing_table: function (frm) {
+		var df_type = frm.events._get_ingredient_weighing_table_field(
+			frm,
+			'ingredient_type',
+		);
+		if (df_type) {
+			df_type.hidden = 1;
+		}
+
+		var df_warehouse = frm.events._get_ingredient_weighing_table_field(
+			frm,
+			'source_warehouse',
+		);
+		if (df_warehouse) {
+			df_warehouse.read_only = 1;
+		}
+
+		var df_actual_weight = frm.events._get_ingredient_weighing_table_field(
+			frm,
+			'actual_weight',
+		);
+		if (df_actual_weight) {
+			df_actual_weight.columns = 2;
+		}
+
+		var df_requested_weight = frm.events._get_ingredient_weighing_table_field(
+			frm,
+			'requested_weight',
+		);
+		if (df_requested_weight) {
+			df_requested_weight.columns = 2;
+		}
+
+		frm.fields_dict['ingredients'].grid.cannot_add_rows = true;
+		frm.fields_dict['ingredients'].grid.cannot_delete_rows = true;
+
+		frm.refresh_field('weighing_table_lgm');
+	},
+
+	_get_ingredient_weighing_table_field: function (frm, fieldname) {
+		return frappe.meta.get_docfield(
+			'Ingredients Weighing Table LGM',
+			fieldname,
+			frm.doc.name,
+		);
 	},
 
 	prepare_timer_buttons: function (frm) {

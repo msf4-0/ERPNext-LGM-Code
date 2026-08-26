@@ -298,8 +298,7 @@
   {
    "fieldname": "ingredients",
    "fieldtype": "Table",
-   "options": "Ingredients Weighing Table LGM",
-   "read_only": 1
+   "options": "Ingredients Weighing Table LGM"
   },
   {
    "fieldname": "section_break_instruction",
