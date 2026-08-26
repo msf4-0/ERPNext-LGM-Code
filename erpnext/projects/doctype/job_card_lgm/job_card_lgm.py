@@ -124,9 +124,9 @@ class JobCardLGM(Document):
 	def on_submit(self):
 		self.validate_job_card()
 		self.update_work_order_status()
-		self.create_material_issue_on_submit()
+		self.create_stock_entries_on_submit()
 
-	def create_material_issue_on_submit(self):
+	def create_stock_entries_on_submit(self):
 		# Prevent duplicate creation if a submitted Stock Entry already exists for THIS Job Card
 		existing_entry = frappe.db.get_value(
 			"Stock Entry",
@@ -143,39 +143,104 @@ class JobCardLGM(Document):
 
 		wip = _get_wip_warehouse()
 		ingredient_list = self.get("ingredients", [])
-		weights = {}
+		requested_weights = {}
+		actual_weights = {}
 
 		for row in ingredient_list:
-			if row.actual_weight:
-				ingredient_name = row.ingredient
-				weights[ingredient_name] = weights.get(ingredient_name, 0) + float(row.actual_weight)
+			ingredient_name = row.ingredient
 
-		if not weights:
+			if row.requested_weight:
+				requested_weights[ingredient_name] = requested_weights.get(ingredient_name, 0) + float(row.requested_weight)
+
+			if row.actual_weight:
+				actual_weights[ingredient_name] = actual_weights.get(ingredient_name, 0) + float(row.actual_weight)
+
+		if not actual_weights:
 			return
 
-		shortfalls = _get_stock_shortfalls(weights)
+		shortfalls = _get_stock_shortfalls(actual_weights)
 		if shortfalls:
 			frappe.throw(_("Cannot submit: Insufficient stock for one or more ingredients in WIP warehouse."))
 
-		stock_entry_details = []
-		for ingredient_name, requested_weight in weights.items():
-			stock_entry_details.append(dict(
+		self._create_used_material_issue(actual_weights)
+		self._create_unused_material_transfer(requested_weights, actual_weights)
+
+	def _create_used_material_issue(self, actual_weights):
+		"""
+		Creates material issues to consume ingredients based on actual weight
+		"""
+		material_issue_stock_entry_details = []
+		wip = _get_wip_warehouse()
+
+		if not actual_weights:
+			return
+
+		for ingredient_name, actual_weight in actual_weights.items():
+			material_issue_stock_entry_details.append(dict(
 				s_warehouse=wip,
 				item_code=ingredient_name,
-				qty=requested_weight
+				qty=actual_weight
 			))
 
 		# Include job_card_lgm when inserting the new Stock Entry
-		stock_entry = frappe.get_doc(dict(
+		material_issue_stock_entry = frappe.get_doc(dict(
 			doctype="Stock Entry",
 			stock_entry_type="Material Issue",
 			work_order_lgm=self.work_order,
 			job_card_lgm=self.name, # Link the Stock Entry back to this Job Card
 			from_warehouse=wip,
-			items=stock_entry_details,
+			items=material_issue_stock_entry_details,
 		)).insert()
 
-		stock_entry.submit()
+		material_issue_stock_entry.submit()
+
+	def _create_unused_material_transfer(self, requested_weights, actual_weights):
+		"""
+		Creates a material transfer for unused remaining weights.
+		"""
+		wip = _get_wip_warehouse()
+		unused_wip = _get_unused_wip_warehouse()
+		material_transfer_stock_entry_details = []
+
+		for ingredient_name, requested_weight in requested_weights.items():
+			unused_weight = requested_weight - actual_weights.get(ingredient_name, 0)
+
+			if unused_weight <= 0:
+				continue
+
+			material_transfer_stock_entry_details.append(dict(
+				s_warehouse=wip,
+				t_warehouse=unused_wip,
+				item_code=ingredient_name,
+				qty=unused_weight
+			))
+
+		if not material_transfer_stock_entry_details:
+			return
+
+		# Include job_card_lgm when inserting the new Stock Entry
+		material_transfer_stock_entry = frappe.get_doc(dict(
+			doctype="Stock Entry",
+			stock_entry_type="Material Transfer",
+			work_order_lgm=self.work_order,
+			job_card_lgm=self.name,
+			from_warehouse=wip,
+			to_warehouse=unused_wip,
+			items=material_transfer_stock_entry_details,
+		)).insert()
+
+		material_transfer_stock_entry.submit()
+
+def _get_unused_wip_warehouse():
+	warehouse_name = "Unused Work In Progress"
+
+	warehouses = frappe.get_all("Warehouse", filters = {"name": ["like", "%" + warehouse_name + "%"]}, fields="name")
+	if not warehouses:
+		frappe.throw(_('No warehouse matching name {0} was found').format(warehouse_name))
+
+	unused_wip = warehouses[0]["name"]
+
+	return unused_wip
 
 # Whitelisted function called by JS client-side purely for stock checking
 @frappe.whitelist()
@@ -315,6 +380,9 @@ def _get_stock_shortfalls(weights):
 	"""
 	shortfalls = []
 	wip_whouse = _get_wip_warehouse()
+
+	if not weights:
+		return []
 
 	for ingredient_name, needed_qty in weights.items():
 		bin_qty = frappe.get_value(

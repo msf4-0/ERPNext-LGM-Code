@@ -322,6 +322,8 @@ def update_status(work_order_name):
 	"""
 	DOCTYPE_CANCELLED_STATUS_NUM = 2
 
+	old_status = frappe.db.get_value("Work Order LGM", work_order_name, "status")
+
 	if frappe.db.get_value("Work Order LGM", work_order_name, "docstatus") == DOCTYPE_CANCELLED_STATUS_NUM:
 		return
 
@@ -340,7 +342,7 @@ def update_status(work_order_name):
 
 	frappe.db.set_value("Work Order LGM", work_order_name, "status", new_status)
 
-	if new_status == "Completed":
+	if new_status == "Completed" and old_status != "Completed":
 		_issue_finished_goods(work_order_name)
 
 	frappe.publish_realtime(
@@ -383,7 +385,8 @@ def create_unique_stock_entry(work_order_name, entry_type, items_list):
         {
             "work_order_lgm": work_order_name,
             "stock_entry_type": entry_type,
-            "docstatus": 1
+            "docstatus": 1,
+			"job_card_lgm": ["in", ["", None]],
         },
         "name"
     )
