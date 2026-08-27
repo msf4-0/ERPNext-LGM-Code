@@ -132,7 +132,6 @@ class JobCardLGM(Document):
               self._get_existing_stock_entry("Material Transfer")):
             frappe.throw(_("Error: Stock entries were already created previously"))
 
-        wip = _get_wip_warehouse()
         ingredient_list = self.get("ingredients", [])
         requested_weights = {}
         actual_weights = {}
@@ -140,11 +139,14 @@ class JobCardLGM(Document):
         for row in ingredient_list:
             ingredient_name = row.ingredient
 
-            if row.requested_weight:
-                requested_weights[ingredient_name] = requested_weights.get(ingredient_name, 0) + float(row.requested_weight)
-
-            if row.actual_weight is not None:
-                actual_weights[ingredient_name] = actual_weights.get(ingredient_name, 0) + float(row.actual_weight)
+            if not row.requested_weight:
+                frappe.throw(_("Requested weight for ingredient: {0}, mix: {1} not set.").format(row.get("ingredient"), row.get("mix_no")))
+            
+            if not row.actual_weight:
+                frappe.throw(_("Actual weight for ingredient: {0}, mix: {1} not set.").format(row.get("ingredient"), row.get("mix_no")))
+            
+            requested_weights[ingredient_name] = requested_weights.get(ingredient_name, 0) + float(row.requested_weight)
+            actual_weights[ingredient_name] = actual_weights.get(ingredient_name, 0) + float(row.actual_weight)
 
         if not requested_weights:
             return
