@@ -173,7 +173,7 @@ class JobCardLGM(Document):
             "name"
         )
         if existing_entry:
-            return
+            return existing_entry
 
     def _create_used_material_issue(self, actual_weights):
         """
