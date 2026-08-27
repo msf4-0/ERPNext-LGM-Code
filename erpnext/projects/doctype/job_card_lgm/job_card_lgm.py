@@ -317,31 +317,20 @@ def create_material_issue(doc):
 
 	ingredient_list = doc.get("ingredients", [])
 	weights = {}
-	# summing up the weights based on (ingredient, source_warehouse) — the
-	# override, if the human picked a fallback for this ingredient, wins over
-	# the row's own source_warehouse
+
 	for row in ingredient_list:
 		if row.get("actual_weight"):
-			ingredient_name = row.get("ingredient")
+			ingredient_name = 
 			key = ingredient_name
 			weights[key] = weights.get(key, 0) + float(row["actual_weight"])
 
 	if not weights:
 		return True
 
-	# re-check availability against the *final resolved* warehouse for each
-	# ingredient (its own source_warehouse, or the human-provided override).
-	# This is necessary because the earlier check_stock_availability call only
-	# ever validated each row's original source_warehouse — it has no way of
-	# knowing whether a fallback warehouse the human just picked is itself
-	# short. Same shape of result as check_stock_availability, so the caller
-	# can reuse the same dialog logic if this comes back non-empty.
 	shortfalls = _get_stock_shortfalls(weights)
 	if shortfalls:
 		return shortfalls
 
-	# put each (ingredient, source_warehouse) pair and its total weight into
-	# the stock entry's item rows
 	stock_entry_details = []
 	for ingredient_name, requested_weight in weights.items():
 		stock_entry_details.append(dict(
@@ -350,8 +339,6 @@ def create_material_issue(doc):
 			qty = requested_weight
 		))
 
-	# insert stock entry record here — no single header-level from_warehouse
-	# any more, since source warehouses now differ per row
 	stock_entry = frappe.get_doc(dict(
 		doctype = "Stock Entry",
 		stock_entry_type = "Material Issue",
