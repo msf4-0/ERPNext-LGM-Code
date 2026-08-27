@@ -317,50 +317,6 @@ def get_all_job_card():
             output.append(forms.work_order)
     return output
 
-# function to create the Material Transfer stock entry for a work order.
-# warehouse_overrides is an optional {ingredient: fallback_warehouse} map —
-# populated by the user when check_stock_availability found that ingredient's
-# normal source_warehouse short, and they picked a different warehouse to
-# pull from instead. Any ingredient not in the map uses its own row-level
-# source_warehouse as usual.
-@frappe.whitelist()
-def create_material_issue(doc):
-    doc = json.loads(doc)
-    wip = _get_wip_warehouse()
-
-    ingredient_list = doc.get("ingredients", [])
-    weights = {}
-
-    for row in ingredient_list:
-        if row.get("actual_weight"):
-            key = row.get("ingredient")
-            weights[key] = weights.get(key, 0) + float(row["actual_weight"])
-
-    if not weights:
-        return True
-
-    shortfalls = _get_stock_shortfalls(weights)
-    if shortfalls:
-        return shortfalls
-
-    stock_entry_details = []
-    for ingredient_name, requested_weight in weights.items():
-        stock_entry_details.append(dict(
-            s_warehouse = wip,
-            item_code = ingredient_name,
-            qty = requested_weight
-        ))
-
-    stock_entry = frappe.get_doc(dict(
-        doctype = "Stock Entry",
-        stock_entry_type = "Material Issue",
-        work_order_lgm = doc["work_order"],
-        from_warehouse = wip,
-        items = stock_entry_details,
-    )).insert()
-    stock_entry.submit()
-    return True
-
 def _get_wip_warehouse(whouse_name = "Work In Progress"):
     warehouses = frappe.get_all("Warehouse", fields="name")
     wip = None
