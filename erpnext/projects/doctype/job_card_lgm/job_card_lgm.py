@@ -128,18 +128,9 @@ class JobCardLGM(Document):
 
 	def create_stock_entries_on_submit(self):
 		# Prevent duplicate creation if a submitted Stock Entry already exists for THIS Job Card
-		existing_entry = frappe.db.get_value(
-			"Stock Entry",
-			{
-				"work_order_lgm": self.work_order,
-				"job_card_lgm": self.name, # Now checks at the Job Card level
-				"stock_entry_type": "Material Issue",
-				"docstatus": 1
-			},
-			"name"
-		)
-		if existing_entry:
-			return
+		if (self._get_existing_stock_entry("Material Issue") or 
+	  		self._get_existing_stock_entry("Material Transfer")):
+			frappe.throw(_("Error: Stock entries were already created previously"))
 
 		wip = _get_wip_warehouse()
 		ingredient_list = self.get("ingredients", [])
@@ -164,6 +155,23 @@ class JobCardLGM(Document):
 
 		self._create_used_material_issue(actual_weights)
 		self._create_unused_material_transfer(requested_weights, actual_weights)
+
+	def _get_existing_stock_entry(self, stock_entry_type):
+		"""
+		Returns existing stock entry of the chosen type if it exists.
+		"""
+		existing_entry = frappe.db.get_value(
+			"Stock Entry",
+			{
+				"work_order_lgm": self.work_order,
+				"job_card_lgm": self.name,
+				"stock_entry_type": stock_entry_type,
+				"docstatus": 1
+			},
+			"name"
+		)
+		if existing_entry:
+			return
 
 	def _create_used_material_issue(self, actual_weights):
 		"""
