@@ -399,3 +399,34 @@ def _get_stock_shortfalls(weights):
             })
 
     return shortfalls
+
+@frappe.whitelist(allow_guest=True)
+def get_weight_from_nodered():
+    NAMING_SERIES_PREFIX = "PO-JOB-"
+
+    data = json.loads(frappe.request.data)
+
+    job_card_no = data.get("job_card") or data.get("work") # "work" kept for legacy reasons
+    ingredient_name = data["name"]
+    mix_no = data["mix"]
+    weight = data["weight"]
+
+    job_card_id = str(job_card_no)
+    if not job_card_id.startswith(NAMING_SERIES_PREFIX):
+        job_card_id = NAMING_SERIES_PREFIX + job_card_id
+
+    try:
+        doc = frappe.get_doc("Job Card LGM", job_card_id)
+    except:
+        frappe.throw("Job Card cannot be retrieved based on given ID.")
+
+    ingredient_list = doc.ingredients
+    for ingredient in ingredient_list:
+        if ingredient.ingredient == ingredient_name and ingredient.mix_no == mix_no:
+            ingredient.actual_weight = weight
+
+            doc.save(ignore_permissions = True)
+            doc.reload()
+            return "found"
+        
+    return "not found"
