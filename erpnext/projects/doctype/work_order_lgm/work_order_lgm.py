@@ -174,6 +174,8 @@ def create_job_card_lgm(doc):
     Creates Job Card LGM documents based on values filled in the doc.
     One job card will be created per ingredient type.
     """
+    CANCELLED_DOCSTATUS = 2
+    
     doc = json.loads(doc)
     ingredients_dict = get_ingredients(doc)
 
@@ -205,7 +207,8 @@ def create_job_card_lgm(doc):
         # Skip gracefully instead of aborting the entire process
         if frappe.db.exists("Job Card LGM", {
             "work_order": doc.get("name"),
-            "ingredient_type": ingredient_type
+            "ingredient_type": ingredient_type,
+			"docstatus": ["!=", CANCELLED_DOCSTATUS]
         }):
             continue 
 
