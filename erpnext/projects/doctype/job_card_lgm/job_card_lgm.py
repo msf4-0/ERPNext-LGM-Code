@@ -320,8 +320,7 @@ def create_material_issue(doc):
 
 	for row in ingredient_list:
 		if row.get("actual_weight"):
-			ingredient_name = 
-			key = ingredient_name
+			key = row.get("ingredient")
 			weights[key] = weights.get(key, 0) + float(row["actual_weight"])
 
 	if not weights:
