@@ -152,10 +152,10 @@ class JobCardLGM(Document):
 			if row.requested_weight:
 				requested_weights[ingredient_name] = requested_weights.get(ingredient_name, 0) + float(row.requested_weight)
 
-			if row.actual_weight:
+			if row.actual_weight is not None:
 				actual_weights[ingredient_name] = actual_weights.get(ingredient_name, 0) + float(row.actual_weight)
 
-		if not actual_weights:
+		if not requested_weights:
 			return
 
 		shortfalls = _get_stock_shortfalls(actual_weights)
