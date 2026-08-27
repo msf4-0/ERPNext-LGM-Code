@@ -318,6 +318,13 @@ def get_all_job_card():
     return output
 
 def _get_wip_warehouse(whouse_name = "Work In Progress"):
+    """
+    Gets the WIP warehouse used for the job card.
+
+    The 'Source Warehouse' field in the ingredients/weighing table
+    is purely meant for referral purposes, as the ingredients have
+    been moved from their respective sources into the WIP warehouse.
+    """
     warehouses = frappe.get_all("Warehouse", fields="name")
     wip = None
     for warehouse in warehouses:
