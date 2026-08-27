@@ -123,8 +123,8 @@ class JobCardLGM(Document):
 
 	def on_submit(self):
 		self.validate_job_card()
-		self.update_work_order_status()
 		self.create_stock_entries_on_submit()
+		self.update_work_order_status()
 
 	def create_stock_entries_on_submit(self):
 		# Prevent duplicate creation if a submitted Stock Entry already exists for THIS Job Card
